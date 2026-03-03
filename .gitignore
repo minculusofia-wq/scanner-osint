@@ -1,0 +1,29 @@
+# Dependencies
+frontend/node_modules/
+backend/__pycache__/
+backend/app/__pycache__/
+backend/app/**/__pycache__/
+
+# Database
+backend/*.db
+
+# Environment
+backend/.env
+
+# OS
+.DS_Store
+*.swp
+
+# Logs
+logs/
+
+# Next.js
+frontend/.next/
+frontend/out/
+
+# IDE
+.vscode/
+.idea/
+
+# macOS app bundle
+Scanner OSINT.app/
