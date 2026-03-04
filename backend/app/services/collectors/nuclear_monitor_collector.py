@@ -13,13 +13,13 @@ logger = logging.getLogger(__name__)
 # Inspired by SitDeck's nuclear monitoring layer and OSINT community
 NUCLEAR_FEEDS = [
     {
-        "url": "https://www.iaea.org/feeds/newscenter/news",
+        "url": "https://www.iaea.org/feeds/news",
         "name": "IAEA News",
         "keywords_boost": ["nuclear", "radiation", "enrichment", "iaea", "safeguards"],
     },
     {
-        "url": "https://www.nrc.gov/reading-rm/doc-collections/news/rss.xml",
-        "name": "US NRC News",
+        "url": "https://www.federalregister.gov/api/v1/documents.rss?conditions%5Bagencies%5D%5B%5D=nuclear-regulatory-commission",
+        "name": "US NRC (Federal Register)",
         "keywords_boost": ["reactor", "nuclear", "radiation", "emergency"],
     },
 ]

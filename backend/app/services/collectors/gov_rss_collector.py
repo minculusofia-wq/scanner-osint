@@ -10,27 +10,36 @@ logger = logging.getLogger(__name__)
 
 # Government and international org RSS feeds
 GOV_FEEDS = [
+    # US Government
     {
-        "url": "https://www.whitehouse.gov/briefing-room/feed/",
+        "url": "https://www.whitehouse.gov/briefings-statements/feed/",
         "name": "White House",
         "category": "political",
         "region": "north_america",
         "country": "US",
     },
     {
-        "url": "https://www.defense.gov/News/news-stories-rss/",
+        "url": "https://www.federalregister.gov/api/v1/documents.rss?conditions%5Bagencies%5D%5B%5D=defense-department",
         "name": "US DoD",
         "category": "geopolitical",
         "region": "north_america",
         "country": "US",
     },
     {
-        "url": "https://www.state.gov/feed/",
+        "url": "https://www.federalregister.gov/api/v1/documents.rss?conditions%5Bagencies%5D%5B%5D=state-department",
         "name": "State Dept",
         "category": "geopolitical",
         "region": "north_america",
         "country": "US",
     },
+    {
+        "url": "https://www.federalregister.gov/api/v1/documents.rss?conditions%5Bagencies%5D%5B%5D=treasury-department&conditions%5Btype%5D%5B%5D=NOTICE",
+        "name": "US Treasury",
+        "category": "financial",
+        "region": "north_america",
+        "country": "US",
+    },
+    # International orgs
     {
         "url": "https://news.un.org/feed/subscribe/en/news/all/rss.xml",
         "name": "UN News",
@@ -39,29 +48,30 @@ GOV_FEEDS = [
         "country": "",
     },
     {
-        "url": "https://www.consilium.europa.eu/en/rss/",
-        "name": "EU Council",
-        "category": "political",
-        "region": "europe",
-        "country": "",
-    },
-    {
-        "url": "https://www.nato.int/cps/en/natohq/news.htm",
-        "name": "NATO",
-        "category": "geopolitical",
-        "region": "europe",
-        "country": "",
-    },
-    {
-        "url": "https://www.treasury.gov/press-center/press-releases/Pages/rss.aspx",
-        "name": "US Treasury",
+        "url": "https://www.ecb.europa.eu/rss/press.html",
+        "name": "ECB",
         "category": "financial",
-        "region": "north_america",
-        "country": "US",
+        "region": "europe",
+        "country": "",
+    },
+    # Major news (high reliability)
+    {
+        "url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+        "name": "BBC World",
+        "category": "geopolitical",
+        "region": "global",
+        "country": "",
     },
     {
-        "url": "https://rsshub.app/reuters/world",
-        "name": "Reuters World",
+        "url": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
+        "name": "NYT World",
+        "category": "geopolitical",
+        "region": "global",
+        "country": "",
+    },
+    {
+        "url": "https://www.aljazeera.com/xml/rss/all.xml",
+        "name": "Al Jazeera",
         "category": "geopolitical",
         "region": "global",
         "country": "",

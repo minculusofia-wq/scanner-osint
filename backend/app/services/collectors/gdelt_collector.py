@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from datetime import datetime
 
@@ -57,19 +58,41 @@ class GDELTCollector(BaseCollector):
                 timeout=30,
                 headers={"User-Agent": "ScannerOSINT/1.0 (compatible; research tool)"},
             ) as client:
-                response = await client.get(
-                    self.BASE_URL,
-                    params={
-                        "query": query,
-                        "mode": "ArtList",
-                        "maxrecords": "50",
-                        "timespan": "2h",
-                        "format": "json",
-                        "sort": "ToneDesc",
-                    },
-                )
+                # Retry up to 2 times on connection errors
+                response = None
+                for attempt in range(2):
+                    try:
+                        response = await client.get(
+                            self.BASE_URL,
+                            params={
+                                "query": query,
+                                "mode": "ArtList",
+                                "maxrecords": "50",
+                                "timespan": "24h",
+                                "format": "json",
+                                "sort": "DateDesc",
+                            },
+                        )
+                        break
+                    except httpx.ConnectError:
+                        if attempt == 0:
+                            await asyncio.sleep(2)
+                        else:
+                            raise
+
+                if response is None:
+                    return items
+
                 response.raise_for_status()
-                data = response.json()
+                text = response.text.strip()
+                if not text:
+                    logger.debug(f"GDELT: empty response for theme '{query}'")
+                    return items
+                try:
+                    data = response.json()
+                except Exception:
+                    logger.debug(f"GDELT: invalid JSON for theme '{query}'")
+                    return items
 
             articles = data.get("articles", [])
             logger.info(f"GDELT: fetched {len(articles)} articles for theme '{query}'")

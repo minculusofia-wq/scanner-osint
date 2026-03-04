@@ -57,7 +57,7 @@ class NOAACollector(BaseCollector):
             },
         ) as client:
             try:
-                resp = await client.get(NOAA_ALERTS_URL, params={"status": "actual", "limit": 50})
+                resp = await client.get(NOAA_ALERTS_URL, params={"status": "actual"})
                 resp.raise_for_status()
                 data = resp.json()
 

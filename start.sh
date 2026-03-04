@@ -51,10 +51,17 @@ echo "  Premiere collecte en cours..."
 STATS=$(curl -s -X POST http://localhost:8001/api/intelligence/collect 2>/dev/null)
 echo "  $STATS"
 
-# Start frontend
-echo "[4/4] Lancement du frontend (port 3001)..."
+# Build & start frontend
+echo "[4/4] Build + lancement du frontend (port 3001)..."
 cd "$FRONTEND_DIR"
-npx next start -p 3001 > "$LOG_DIR/frontend.log" 2>&1 &
+npx next build > "$LOG_DIR/frontend-build.log" 2>&1
+if [ $? -ne 0 ]; then
+    echo "  ERREUR: Build frontend echoue! Voir $LOG_DIR/frontend-build.log"
+    echo "  Lancement en mode dev..."
+    npx next dev -p 3001 > "$LOG_DIR/frontend.log" 2>&1 &
+else
+    npx next start -p 3001 > "$LOG_DIR/frontend.log" 2>&1 &
+fi
 FRONTEND_PID=$!
 echo "  Frontend PID: $FRONTEND_PID"
 

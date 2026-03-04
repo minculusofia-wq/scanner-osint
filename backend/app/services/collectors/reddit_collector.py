@@ -15,24 +15,32 @@ class RedditCollector(BaseCollector):
 
     SUBREDDITS = {
         "polymarket": "financial",
-        "predictit": "financial",
         "geopolitics": "geopolitical",
         "worldnews": "geopolitical",
         "economics": "financial",
         "CryptoCurrency": "crypto",
+        "finance": "financial",
     }
 
     USER_AGENT = "python:ScannerOSINT:v1.0 (by /u/scanner_osint_bot)"
 
     async def collect(self, config: dict) -> list[dict]:
         items = []
-        headers = {"User-Agent": self.USER_AGENT}
+        headers = {
+            "User-Agent": self.USER_AGENT,
+            "Accept": "application/json",
+        }
 
-        async with httpx.AsyncClient(timeout=15, headers=headers) as client:
+        async with httpx.AsyncClient(
+            timeout=15,
+            headers=headers,
+            follow_redirects=True,
+        ) as client:
             for subreddit, category in self.SUBREDDITS.items():
                 try:
+                    # Use old.reddit.com to avoid 403 blocks
                     response = await client.get(
-                        f"https://www.reddit.com/r/{subreddit}/hot.json",
+                        f"https://old.reddit.com/r/{subreddit}/hot.json",
                         params={"limit": 10},
                     )
                     if response.status_code == 429:
