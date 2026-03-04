@@ -10,8 +10,19 @@ interface BriefCardProps {
   onDismiss?: (id: number) => void;
 }
 
+const CONVICTION_LABELS = ["", "Très faible", "Faible", "Modérée", "Forte", "Très forte"];
+const CONVICTION_COLORS = [
+  "",
+  "bg-gray-500",
+  "bg-yellow-500",
+  "bg-orange-500",
+  "bg-red-500",
+  "bg-red-600",
+];
+
 export function BriefCard({ brief, onDismiss }: BriefCardProps) {
   const confidencePct = Math.round(brief.confidence * 100);
+  const hasAI = !!brief.ai_situation;
 
   return (
     <div className="rounded-lg bg-gray-900 border border-gray-800 p-4 space-y-3 hover:border-gray-700 transition-colors">
@@ -23,6 +34,11 @@ export function BriefCard({ brief, onDismiss }: BriefCardProps) {
             <span className="text-xs text-gray-500">{brief.category}</span>
             {brief.region && (
               <span className="text-xs text-gray-500">{brief.region}</span>
+            )}
+            {hasAI && (
+              <span className="px-1.5 py-0.5 text-[9px] rounded bg-violet-500/15 text-violet-400 border border-violet-500/20 font-medium">
+                AI
+              </span>
             )}
           </div>
           <h3 className="text-sm font-semibold text-white leading-tight">
@@ -45,17 +61,86 @@ export function BriefCard({ brief, onDismiss }: BriefCardProps) {
         </div>
       </div>
 
-      {/* Summary */}
-      <p className="text-xs text-gray-400 leading-relaxed line-clamp-3">
-        {brief.summary}
-      </p>
+      {/* AI Analysis OR fallback to rule-based */}
+      {hasAI ? (
+        <div className="space-y-2">
+          {/* Situation */}
+          <div className="rounded bg-gray-800/80 px-3 py-2">
+            <div className="text-[10px] uppercase text-gray-500 font-medium tracking-wider mb-1">
+              Situation
+            </div>
+            <p className="text-xs text-gray-300 leading-relaxed">
+              {brief.ai_situation}
+            </p>
+          </div>
 
-      {/* Trading Implication */}
-      {brief.trading_implication && (
-        <div className="rounded bg-gray-800/60 border border-gray-700/50 px-3 py-2">
-          <div className="text-xs text-gray-500 mb-0.5">Signal trading</div>
-          <p className="text-xs text-gray-300">{brief.trading_implication}</p>
+          {/* Analysis */}
+          <div className="rounded bg-gray-800/60 px-3 py-2">
+            <div className="text-[10px] uppercase text-gray-500 font-medium tracking-wider mb-1">
+              Analyse
+            </div>
+            <p className="text-xs text-gray-300 leading-relaxed">
+              {brief.ai_analysis}
+            </p>
+          </div>
+
+          {/* Trading Signal */}
+          {brief.ai_trading_signal && (
+            <div className="rounded border border-indigo-500/30 bg-indigo-500/5 px-3 py-2">
+              <div className="flex items-center justify-between mb-1">
+                <div className="text-[10px] uppercase text-indigo-400 font-medium tracking-wider">
+                  Signal Trading
+                </div>
+                {brief.ai_confidence > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] text-gray-500">Conviction:</span>
+                    <div className="flex gap-0.5">
+                      {[1, 2, 3, 4, 5].map((level) => (
+                        <div
+                          key={level}
+                          className={`w-2 h-2 rounded-full ${
+                            level <= brief.ai_confidence
+                              ? CONVICTION_COLORS[brief.ai_confidence]
+                              : "bg-gray-700"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-[10px] text-gray-400">
+                      {CONVICTION_LABELS[brief.ai_confidence] || ""}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-gray-200 leading-relaxed">
+                {brief.ai_trading_signal}
+              </p>
+            </div>
+          )}
+
+          {/* Risk Factors */}
+          {brief.ai_risk_factors && (
+            <div className="flex items-start gap-1.5 px-1">
+              <span className="text-amber-500 text-xs mt-0.5 shrink-0">⚠</span>
+              <p className="text-[11px] text-gray-500 leading-relaxed">
+                {brief.ai_risk_factors}
+              </p>
+            </div>
+          )}
         </div>
+      ) : (
+        <>
+          {/* Fallback: rule-based summary + trading implication */}
+          <p className="text-xs text-gray-400 leading-relaxed line-clamp-3">
+            {brief.summary}
+          </p>
+          {brief.trading_implication && (
+            <div className="rounded bg-gray-800/60 border border-gray-700/50 px-3 py-2">
+              <div className="text-xs text-gray-500 mb-0.5">Signal trading</div>
+              <p className="text-xs text-gray-300">{brief.trading_implication}</p>
+            </div>
+          )}
+        </>
       )}
 
       {/* Confidence bar */}

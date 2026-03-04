@@ -31,6 +31,13 @@ class IntelligenceBrief(Base):
     category: Mapped[str] = mapped_column(String(50), default="general")
     region: Mapped[str] = mapped_column(String(100), default="")
 
+    # AI Analysis (Claude Sonnet)
+    ai_situation: Mapped[str] = mapped_column(Text, default="")
+    ai_analysis: Mapped[str] = mapped_column(Text, default="")
+    ai_trading_signal: Mapped[str] = mapped_column(Text, default="")
+    ai_confidence: Mapped[int] = mapped_column(Integer, default=0)
+    ai_risk_factors: Mapped[str] = mapped_column(Text, default="")
+
     # Status
     is_actionable: Mapped[bool] = mapped_column(Boolean, default=False)
     is_dismissed: Mapped[bool] = mapped_column(Boolean, default=False)

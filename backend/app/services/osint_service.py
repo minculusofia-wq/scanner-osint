@@ -5,6 +5,8 @@ import logging
 from datetime import datetime, timedelta
 
 from sqlalchemy import delete, func, select, update
+
+from app.config import settings
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.intelligence_brief import IntelligenceBrief
@@ -35,6 +37,7 @@ from app.services.escalation_engine import EscalationEngine
 from app.services.intelligence_scorer import IntelligenceScorer
 from app.services.market_matcher import MarketMatcher
 from app.services.sentiment_analyzer import SentimentAnalyzer
+from app.services.ai_analyzer import AIAnalyzer
 from app.services.signal_correlator import SignalCorrelator
 
 logger = logging.getLogger(__name__)
@@ -52,6 +55,7 @@ class OSINTService:
         self.escalation_engine = EscalationEngine()
         self.alert_evaluator = AlertEvaluator()
         self.alert_config_service = AlertConfigService()
+        self.ai_analyzer = AIAnalyzer()
 
         self._collectors = {
             # News/Data
@@ -266,6 +270,18 @@ class OSINTService:
 
         briefs = self.brief_gen.generate_briefs(item_dicts)
 
+        # 7.1 AI Analysis (Claude Sonnet) — enrich briefs before persist
+        if settings.ANTHROPIC_API_KEY and briefs:
+            try:
+                ai_results = await self.ai_analyzer.analyze_briefs(briefs, item_dicts)
+                for brief_data in briefs:
+                    key = f"{brief_data.get('category', 'general')}:{brief_data.get('region', 'global')}"
+                    if key in ai_results:
+                        brief_data.update(ai_results[key])
+                stats["ai_analyzed"] = len(ai_results)
+            except Exception as e:
+                logger.error(f"AI analysis failed (non-blocking): {e}")
+
         # Delete dismissed briefs and regenerate active ones
         await db.execute(delete(IntelligenceBrief).where(IntelligenceBrief.is_dismissed == True))
         await db.execute(delete(IntelligenceBrief).where(IntelligenceBrief.is_dismissed == False))
@@ -292,6 +308,11 @@ class OSINTService:
                 category=brief_data.get("category", "general"),
                 region=brief_data.get("region", ""),
                 is_actionable=brief_data.get("is_actionable", False),
+                ai_situation=brief_data.get("ai_situation", ""),
+                ai_analysis=brief_data.get("ai_analysis", ""),
+                ai_trading_signal=brief_data.get("ai_trading_signal", ""),
+                ai_confidence=brief_data.get("ai_confidence", 0),
+                ai_risk_factors=brief_data.get("ai_risk_factors", ""),
                 created_at=datetime.utcnow(),
                 expires_at=expires_at,
             )
@@ -543,6 +564,11 @@ class OSINTService:
             "region": brief.region,
             "is_actionable": brief.is_actionable,
             "is_dismissed": brief.is_dismissed,
+            "ai_situation": brief.ai_situation or "",
+            "ai_analysis": brief.ai_analysis or "",
+            "ai_trading_signal": brief.ai_trading_signal or "",
+            "ai_confidence": brief.ai_confidence or 0,
+            "ai_risk_factors": brief.ai_risk_factors or "",
             "created_at": brief.created_at.isoformat() if brief.created_at else None,
             "expires_at": brief.expires_at.isoformat() if brief.expires_at else None,
         }

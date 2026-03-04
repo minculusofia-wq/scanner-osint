@@ -33,6 +33,11 @@ export interface IntelligenceBrief {
   region: string;
   is_actionable: boolean;
   is_dismissed: boolean;
+  ai_situation: string;
+  ai_analysis: string;
+  ai_trading_signal: string;
+  ai_confidence: number;
+  ai_risk_factors: string;
   created_at: string;
   expires_at: string | null;
 }
