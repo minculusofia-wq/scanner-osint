@@ -1,3 +1,4 @@
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
@@ -22,6 +23,14 @@ async def init_db():
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+        # Migrate: add key_headlines column if missing
+        try:
+            await conn.execute(
+                text("ALTER TABLE escalation_trackers ADD COLUMN key_headlines TEXT DEFAULT '[]'")
+            )
+        except Exception:
+            pass  # Column already exists
 
 
 async def get_db():

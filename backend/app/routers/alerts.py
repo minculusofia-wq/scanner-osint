@@ -239,6 +239,7 @@ def _tracker_to_dict(t: EscalationTracker) -> dict:
         "avg_sentiment_1h": t.avg_sentiment_1h,
         "matched_patterns": _safe_json(t.matched_patterns),
         "contributing_source_types": _safe_json(t.contributing_source_types),
+        "key_headlines": _safe_json(t.key_headlines),
         "linked_markets": [
             {"condition_id": mid, "question": mq}
             for mid, mq in zip(

@@ -107,6 +107,9 @@ class EscalationEngine:
                     matched_patterns=json.dumps(
                         [p.pattern.name for p in corr.pattern_matches]
                     ),
+                    key_headlines=json.dumps(
+                        self._extract_headlines(corr), ensure_ascii=False
+                    ),
                     linked_market_ids="[]",
                     linked_market_questions="[]",
                     is_active=True,
@@ -140,6 +143,9 @@ class EscalationEngine:
             tracker.contributing_source_types = json.dumps(corr.source_types)
             tracker.countries = json.dumps(corr.countries)
             tracker.keywords = json.dumps(corr.keywords)
+            tracker.key_headlines = json.dumps(
+                self._extract_headlines(corr), ensure_ascii=False
+            )
             tracker.updated_at = now
 
             # Merge pattern matches
@@ -277,6 +283,31 @@ class EscalationEngine:
                     ),
                     is_upgrade=False,
                 ))
+
+    @staticmethod
+    def _extract_headlines(corr: CorrelationResult) -> list[dict]:
+        """Extract top 5 headlines from correlation items, sorted by priority."""
+        items_with_title = [i for i in corr.items if i.get("title")]
+        sorted_items = sorted(
+            items_with_title,
+            key=lambda x: x.get("priority_score", 0),
+            reverse=True,
+        )
+        # Deduplicate by title (keep highest priority)
+        seen_titles: set[str] = set()
+        headlines = []
+        for item in sorted_items:
+            title = item["title"].strip()
+            if title.lower() in seen_titles:
+                continue
+            seen_titles.add(title.lower())
+            headlines.append({
+                "title": title[:200],
+                "source": item.get("source", ""),
+            })
+            if len(headlines) >= 5:
+                break
+        return headlines
 
     def _generate_name(self, corr: CorrelationResult) -> str:
         """Generate a human-readable tracker name."""

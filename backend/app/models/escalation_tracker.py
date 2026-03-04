@@ -40,6 +40,7 @@ class EscalationTracker(Base):
     # Contributing intelligence
     contributing_item_ids: Mapped[str] = mapped_column(Text, default="[]")
     contributing_source_types: Mapped[str] = mapped_column(Text, default="[]")
+    key_headlines: Mapped[str] = mapped_column(Text, default="[]")
 
     # Matched precursor patterns
     matched_patterns: Mapped[str] = mapped_column(Text, default="[]")

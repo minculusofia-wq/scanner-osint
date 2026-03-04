@@ -83,6 +83,23 @@ export function EscalationCard({
         </div>
       )}
 
+      {/* Key Headlines */}
+      {tracker.key_headlines && tracker.key_headlines.length > 0 && (
+        <div className="space-y-1.5 border-t border-gray-800 pt-2">
+          <div className="text-[10px] uppercase text-gray-500 font-medium tracking-wider">
+            Signaux clés
+          </div>
+          {tracker.key_headlines.slice(0, 3).map((h, i) => (
+            <div key={i} className="flex items-start gap-2 text-xs">
+              <span className="shrink-0 mt-0.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase">
+                {(h.source || "?").replace(/_/g, " ").slice(0, 12)}
+              </span>
+              <span className="text-gray-300 line-clamp-1">{h.title}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Countries */}
       {tracker.countries.length > 0 && (
         <div className="text-xs text-gray-500">

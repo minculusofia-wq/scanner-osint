@@ -120,6 +120,7 @@ export interface EscalationTracker {
   avg_sentiment_1h: number;
   matched_patterns: string[];
   contributing_source_types: string[];
+  key_headlines: { title: string; source: string }[];
   linked_markets: LinkedMarket[];
   is_active: boolean;
   created_at: string;
