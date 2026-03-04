@@ -90,6 +90,10 @@ class AIAnalyzer:
                     json=payload,
                 )
 
+            if resp.status_code == 429:
+                logger.warning("Gemini API rate limited (429) — skipping AI analysis this cycle")
+                return {}
+
             if resp.status_code != 200:
                 logger.error(f"Gemini API error {resp.status_code}: {resp.text[:300]}")
                 return {}
