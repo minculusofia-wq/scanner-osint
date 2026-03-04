@@ -170,9 +170,13 @@ class AIAnalyzer:
             except (json.JSONDecodeError, TypeError):
                 pass
 
+        cluster_keys = [
+            f"{b.get('category', 'general')}:{b.get('region', 'global')}"
+            for b in briefs
+        ]
         parts.append(
             f"\n\nRéponds en JSON avec les clés exactes des clusters: "
-            f"{json.dumps([f'{b.get(\"category\", \"general\")}:{b.get(\"region\", \"global\")}' for b in briefs])}"
+            f"{json.dumps(cluster_keys)}"
         )
 
         return "\n".join(parts)
