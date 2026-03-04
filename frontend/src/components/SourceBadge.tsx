@@ -15,6 +15,13 @@ const SOURCE_STYLES: Record<string, string> = {
   adsb: "bg-sky-500/20 text-sky-400 border-sky-500/30",
   nasa_firms: "bg-amber-500/20 text-amber-400 border-amber-500/30",
   ship_tracker: "bg-teal-500/20 text-teal-400 border-teal-500/30",
+  usgs_earthquake: "bg-rose-500/20 text-rose-400 border-rose-500/30",
+  noaa_weather: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30",
+  // Behavioral OSINT
+  pentagon_pizza: "bg-pink-500/20 text-pink-400 border-pink-500/30",
+  // Conflict OSINT
+  liveuamap: "bg-red-600/20 text-red-400 border-red-600/30",
+  nuclear_monitor: "bg-yellow-600/20 text-yellow-400 border-yellow-600/30",
   // Social OSINT
   telegram: "bg-blue-400/20 text-blue-300 border-blue-400/30",
   gov_rss: "bg-slate-500/20 text-slate-400 border-slate-500/30",

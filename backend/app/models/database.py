@@ -15,6 +15,10 @@ async def init_db():
     from app.models.intelligence_item import IntelligenceItem  # noqa: F401
     from app.models.intelligence_brief import IntelligenceBrief  # noqa: F401
     from app.models.osint_config import OSINTConfigRecord  # noqa: F401
+    from app.models.escalation_tracker import EscalationTracker  # noqa: F401
+    from app.models.alert_rule import AlertRule  # noqa: F401
+    from app.models.alert_history import AlertHistory  # noqa: F401
+    from app.models.alert_config import AlertConfigRecord  # noqa: F401
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

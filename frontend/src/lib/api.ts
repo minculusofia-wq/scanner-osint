@@ -4,6 +4,11 @@ import type {
   IntelligenceBrief,
   IntelligenceStats,
   OSINTConfig,
+  EscalationTracker,
+  AlertHistoryEntry,
+  AlertRule,
+  AlertConfig,
+  PrecursorPattern,
 } from "@/types/intelligence";
 
 const api = axios.create({
@@ -54,3 +59,46 @@ export const fetchConfig = () =>
 
 export const updateConfig = (data: Partial<OSINTConfig>) =>
   api.put<OSINTConfig>("/intelligence/config", data).then((r) => r.data);
+
+// --- Alerts / Early Warning ---
+
+export const fetchEscalations = (activeOnly = true) =>
+  api
+    .get<EscalationTracker[]>("/alerts/escalations", {
+      params: { active_only: activeOnly },
+    })
+    .then((r) => r.data);
+
+export const fetchAlertHistory = (params?: {
+  limit?: number;
+  offset?: number;
+}) =>
+  api
+    .get<{ items: AlertHistoryEntry[]; total: number }>("/alerts/history", {
+      params,
+    })
+    .then((r) => r.data);
+
+export const fetchAlertRules = () =>
+  api.get<AlertRule[]>("/alerts/rules").then((r) => r.data);
+
+export const createAlertRule = (data: Omit<AlertRule, "id">) =>
+  api.post<AlertRule>("/alerts/rules", data).then((r) => r.data);
+
+export const updateAlertRule = (id: number, data: Omit<AlertRule, "id">) =>
+  api.put<AlertRule>(`/alerts/rules/${id}`, data).then((r) => r.data);
+
+export const deleteAlertRule = (id: number) =>
+  api.delete(`/alerts/rules/${id}`).then((r) => r.data);
+
+export const fetchAlertConfig = () =>
+  api.get<AlertConfig>("/alerts/config").then((r) => r.data);
+
+export const updateAlertConfig = (data: Partial<AlertConfig>) =>
+  api.put<AlertConfig>("/alerts/config", data).then((r) => r.data);
+
+export const sendTestAlert = () =>
+  api.post("/alerts/test").then((r) => r.data);
+
+export const fetchPatterns = () =>
+  api.get<PrecursorPattern[]>("/alerts/patterns").then((r) => r.data);

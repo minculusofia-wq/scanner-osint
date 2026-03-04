@@ -302,7 +302,7 @@ export default function SettingsPage() {
           {
             key: "adsb_enabled" as const,
             label: "OpenSky ADS-B",
-            desc: "Suivi d'avions militaires/gouvernementaux (gratuit)",
+            desc: "Suivi d'avions militaires/gouvernementaux — Iran, Israël, Ukraine, etc. (gratuit)",
           },
           {
             key: "nasa_firms_enabled" as const,
@@ -312,7 +312,17 @@ export default function SettingsPage() {
           {
             key: "ship_tracker_enabled" as const,
             label: "Ship Tracker",
-            desc: "Activité maritime dans les détroits stratégiques (gratuit)",
+            desc: "Activité maritime : Ormuz, Suez, Bab el-Mandeb, Malacca (gratuit)",
+          },
+          {
+            key: "usgs_earthquake_enabled" as const,
+            label: "USGS Séismes",
+            desc: "Séismes M2.5+ temps réel — Iran, Turquie, Japon, Taiwan (gratuit)",
+          },
+          {
+            key: "noaa_weather_enabled" as const,
+            label: "NOAA Alertes Météo",
+            desc: "Alertes météo sévères : tsunamis, ouragans, tempêtes (gratuit)",
           },
         ].map((source) => (
           <div key={source.key} className="border-b border-gray-800 pb-4 last:border-0 last:pb-0">
@@ -325,6 +335,79 @@ export default function SettingsPage() {
                 onClick={() => save({ [source.key]: !config[source.key] })}
                 className={`w-12 h-6 rounded-full transition-colors ${
                   config[source.key] ? "bg-sky-600" : "bg-gray-700"
+                }`}
+              >
+                <div
+                  className={`w-5 h-5 bg-white rounded-full transition-transform mx-0.5 ${
+                    config[source.key] ? "translate-x-6" : "translate-x-0"
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* Behavioral OSINT */}
+      <section className="rounded-lg bg-gray-900 border border-pink-800/50 p-5 space-y-4">
+        <h3 className="text-sm font-semibold text-pink-400">OSINT Comportemental</h3>
+
+        {[
+          {
+            key: "pentagon_pizza_enabled" as const,
+            label: "Pentagon Pizza Index",
+            desc: "Activite nocturne anormale pres du Pentagone, CIA, Maison Blanche (gratuit)",
+          },
+        ].map((source) => (
+          <div key={source.key} className="border-b border-gray-800 pb-4 last:border-0 last:pb-0">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <div className="text-sm text-white">{source.label}</div>
+                <div className="text-xs text-gray-500">{source.desc}</div>
+              </div>
+              <button
+                onClick={() => save({ [source.key]: !config[source.key] })}
+                className={`w-12 h-6 rounded-full transition-colors ${
+                  config[source.key] ? "bg-pink-600" : "bg-gray-700"
+                }`}
+              >
+                <div
+                  className={`w-5 h-5 bg-white rounded-full transition-transform mx-0.5 ${
+                    config[source.key] ? "translate-x-6" : "translate-x-0"
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* Conflict OSINT */}
+      <section className="rounded-lg bg-gray-900 border border-red-800/50 p-5 space-y-4">
+        <h3 className="text-sm font-semibold text-red-400">OSINT Conflits</h3>
+
+        {[
+          {
+            key: "liveuamap_enabled" as const,
+            label: "LiveUAMap",
+            desc: "Événements de conflits temps réel : Ukraine, Moyen-Orient, Afrique (gratuit)",
+          },
+          {
+            key: "nuclear_monitor_enabled" as const,
+            label: "Monitoring Nucléaire",
+            desc: "AIEA, NRC — prolifération, incidents, diplomatie nucléaire (gratuit)",
+          },
+        ].map((source) => (
+          <div key={source.key} className="border-b border-gray-800 pb-4 last:border-0 last:pb-0">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <div className="text-sm text-white">{source.label}</div>
+                <div className="text-xs text-gray-500">{source.desc}</div>
+              </div>
+              <button
+                onClick={() => save({ [source.key]: !config[source.key] })}
+                className={`w-12 h-6 rounded-full transition-colors ${
+                  config[source.key] ? "bg-red-600" : "bg-gray-700"
                 }`}
               >
                 <div

@@ -1,17 +1,33 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useIntelligence } from "@/hooks/useIntelligence";
 import { Header } from "@/components/layout/Header";
 import { StatsBar } from "@/components/StatsBar";
 import { BriefCard } from "@/components/BriefCard";
 import { SignalCard } from "@/components/SignalCard";
 import { ItemCard } from "@/components/ItemCard";
-import { dismissBrief } from "@/lib/api";
+import { EscalationCard } from "@/components/EscalationCard";
+import { dismissBrief, fetchEscalations } from "@/lib/api";
+import type { EscalationTracker } from "@/types/intelligence";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const { items, briefs, stats, loading, collecting, error, collect, refresh } =
     useIntelligence(true);
 
+  const [escalations, setEscalations] = useState<EscalationTracker[]>([]);
+  useEffect(() => {
+    fetchEscalations().then(setEscalations).catch(() => {});
+    const iv = setInterval(() => {
+      fetchEscalations().then(setEscalations).catch(() => {});
+    }, 30000);
+    return () => clearInterval(iv);
+  }, []);
+
+  const activeEscalations = escalations.filter(
+    (e) => e.escalation_level !== "stable"
+  );
   const actionableBriefs = briefs.filter((b) => b.is_actionable);
   const topItems = items.filter((i) => i.urgency === "critical" || i.urgency === "high").slice(0, 10);
 
@@ -61,6 +77,28 @@ export default function DashboardPage() {
         </div>
       ) : (
         <>
+          {/* Escalation Banner */}
+          {activeEscalations.length > 0 && (
+            <section>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-red-400 uppercase tracking-wider">
+                  Escalades actives ({activeEscalations.length})
+                </h3>
+                <Link
+                  href="/alerts"
+                  className="text-xs text-indigo-400 hover:text-indigo-300"
+                >
+                  Voir tout
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                {activeEscalations.slice(0, 3).map((tracker) => (
+                  <EscalationCard key={tracker.id} tracker={tracker} />
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Actionable Signals */}
           {actionableBriefs.length > 0 && (
             <section>

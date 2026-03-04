@@ -18,7 +18,9 @@ const URGENCIES = ["", "critical", "high", "medium", "low"];
 const SOURCES = [
   "", "gdelt", "newsdata", "acled", "finnhub", "reddit",
   "sec_edgar", "whale_crypto", "fred",
-  "adsb", "nasa_firms", "ship_tracker",
+  "adsb", "nasa_firms", "ship_tracker", "usgs_earthquake", "noaa_weather",
+  "pentagon_pizza",
+  "liveuamap", "nuclear_monitor",
   "telegram", "gov_rss",
 ];
 

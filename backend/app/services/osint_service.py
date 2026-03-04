@@ -17,16 +17,25 @@ from app.services.collectors.finnhub_collector import FinnhubCollector
 from app.services.collectors.fred_collector import FREDCollector
 from app.services.collectors.gdelt_collector import GDELTCollector
 from app.services.collectors.gov_rss_collector import GovRSSCollector
+from app.services.collectors.liveuamap_collector import LiveUAMapCollector
 from app.services.collectors.nasa_firms_collector import NASAFirmsCollector
 from app.services.collectors.newsdata_collector import NewsDataCollector
+from app.services.collectors.noaa_alerts_collector import NOAACollector
+from app.services.collectors.nuclear_monitor_collector import NuclearMonitorCollector
 from app.services.collectors.reddit_collector import RedditCollector
 from app.services.collectors.sec_edgar_collector import SECEdgarCollector
 from app.services.collectors.ship_tracker_collector import ShipTrackerCollector
 from app.services.collectors.telegram_collector import TelegramCollector
+from app.services.collectors.usgs_earthquake_collector import USGSEarthquakeCollector
+from app.services.collectors.pentagon_pizza_collector import PentagonPizzaCollector
 from app.services.collectors.whale_crypto_collector import WhaleCryptoCollector
+from app.services.alert_config_service import AlertConfigService
+from app.services.alert_evaluator import AlertEvaluator
+from app.services.escalation_engine import EscalationEngine
 from app.services.intelligence_scorer import IntelligenceScorer
 from app.services.market_matcher import MarketMatcher
 from app.services.sentiment_analyzer import SentimentAnalyzer
+from app.services.signal_correlator import SignalCorrelator
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +48,10 @@ class OSINTService:
         self.scorer = IntelligenceScorer()
         self.matcher = MarketMatcher()
         self.brief_gen = BriefGenerator()
+        self.correlator = SignalCorrelator()
+        self.escalation_engine = EscalationEngine()
+        self.alert_evaluator = AlertEvaluator()
+        self.alert_config_service = AlertConfigService()
 
         self._collectors = {
             # News/Data
@@ -55,6 +68,13 @@ class OSINTService:
             "adsb": ADSBCollector(),
             "nasa_firms": NASAFirmsCollector(),
             "ship_tracker": ShipTrackerCollector(),
+            "usgs_earthquake": USGSEarthquakeCollector(),
+            "noaa_weather": NOAACollector(),
+            # Behavioral OSINT
+            "pentagon_pizza": PentagonPizzaCollector(),
+            # Conflict OSINT
+            "liveuamap": LiveUAMapCollector(),
+            "nuclear_monitor": NuclearMonitorCollector(),
             # Social OSINT
             "telegram": TelegramCollector(),
             "gov_rss": GovRSSCollector(),
@@ -108,6 +128,25 @@ class OSINTService:
         if config.ship_tracker_enabled:
             tasks.append(self._collectors["ship_tracker"].collect(config_dict))
             source_names.append("ship_tracker")
+        if config.usgs_earthquake_enabled:
+            tasks.append(self._collectors["usgs_earthquake"].collect(config_dict))
+            source_names.append("usgs_earthquake")
+        if config.noaa_weather_enabled:
+            tasks.append(self._collectors["noaa_weather"].collect(config_dict))
+            source_names.append("noaa_weather")
+
+        # Behavioral OSINT
+        if config.pentagon_pizza_enabled:
+            tasks.append(self._collectors["pentagon_pizza"].collect(config_dict))
+            source_names.append("pentagon_pizza")
+
+        # Conflict OSINT
+        if config.liveuamap_enabled:
+            tasks.append(self._collectors["liveuamap"].collect(config_dict))
+            source_names.append("liveuamap")
+        if config.nuclear_monitor_enabled:
+            tasks.append(self._collectors["nuclear_monitor"].collect(config_dict))
+            source_names.append("nuclear_monitor")
 
         # Social OSINT
         if config.telegram_enabled:
@@ -260,6 +299,35 @@ class OSINTService:
 
         await db.commit()
         stats["briefs_generated"] = len(briefs)
+
+        # 7.5 Signal Correlation
+        try:
+            correlation_results = await self.correlator.correlate(db)
+            stats["correlations"] = len(correlation_results)
+        except Exception as e:
+            logger.error(f"Signal correlation failed: {e}", exc_info=True)
+            correlation_results = []
+
+        # 7.6 Escalation Tracking
+        try:
+            escalation_events = await self.escalation_engine.update_trackers(
+                db, correlation_results
+            )
+            stats["escalation_events"] = len(escalation_events)
+        except Exception as e:
+            logger.error(f"Escalation tracking failed: {e}", exc_info=True)
+            escalation_events = []
+
+        # 7.7 Alert Dispatch
+        if escalation_events:
+            try:
+                alert_config = await self.alert_config_service.get_config(db)
+                sent = await self.alert_evaluator.evaluate(
+                    db, escalation_events, alert_config
+                )
+                stats["alerts_sent"] = len(sent)
+            except Exception as e:
+                logger.error(f"Alert dispatch failed: {e}", exc_info=True)
 
         # 8. Mark stale items
         await self._mark_stale(db, config.stale_after_hours)

@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     ETHERSCAN_API_KEY: str = ""
     FRED_API_KEY: str = ""
 
+    # Alerts
+    DISCORD_WEBHOOK_URL: str = ""
+
     # Collection
     COLLECTION_INTERVAL: int = 600  # seconds (10 min default)
 

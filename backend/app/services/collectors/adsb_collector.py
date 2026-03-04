@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 OPENSKY_URL = "https://opensky-network.org/api/states/all"
 
 # Strategic zones to monitor
+# Expanded Middle East coverage per OSINT community (FlightRadar24 + @clement_molin thread)
 MONITORING_ZONES = [
     {
         "name": "Ukraine",
@@ -23,8 +24,23 @@ MONITORING_ZONES = [
         "region": "asia",
     },
     {
-        "name": "Persian Gulf",
-        "bbox": {"lamin": 24.0, "lomin": 48.0, "lamax": 30.0, "lomax": 57.0},
+        "name": "Persian Gulf / Strait of Hormuz",
+        "bbox": {"lamin": 23.0, "lomin": 48.0, "lamax": 30.0, "lomax": 60.0},
+        "region": "middle_east",
+    },
+    {
+        "name": "Israel / Lebanon / Syria",
+        "bbox": {"lamin": 29.0, "lomin": 33.0, "lamax": 37.5, "lomax": 42.0},
+        "region": "middle_east",
+    },
+    {
+        "name": "Iran Airspace",
+        "bbox": {"lamin": 25.0, "lomin": 44.0, "lamax": 40.0, "lomax": 63.5},
+        "region": "middle_east",
+    },
+    {
+        "name": "Red Sea / Bab el-Mandeb",
+        "bbox": {"lamin": 11.0, "lomin": 39.0, "lamax": 20.0, "lomax": 46.0},
         "region": "middle_east",
     },
     {
@@ -35,6 +51,11 @@ MONITORING_ZONES = [
     {
         "name": "Baltic Sea",
         "bbox": {"lamin": 53.0, "lomin": 12.0, "lamax": 66.0, "lomax": 30.0},
+        "region": "europe",
+    },
+    {
+        "name": "Eastern Mediterranean",
+        "bbox": {"lamin": 31.0, "lomin": 24.0, "lamax": 38.0, "lomax": 36.0},
         "region": "europe",
     },
 ]
@@ -64,6 +85,23 @@ MILITARY_CALLSIGNS = [
     # Reconnaissance patterns
     "SIGINT",
     "ELINT",
+    # Israeli Air Force
+    "IAF",
+    "ELAL",  # Sometimes used for military charters
+    # Middle East military
+    "RSAF",   # Royal Saudi Air Force
+    "IQAF",   # Iraqi Air Force
+    "IRIAF",  # Islamic Republic of Iran Air Force
+    # French military
+    "FAF",    # French Air Force
+    "CTM",    # French military transport
+    # UK military
+    "RAF",
+    "RRR",    # RAF transport
+    # Tanker/refueling
+    "LAGR",   # KC-135 tanker
+    "NCHO",   # KC-46
+    "PACK",   # KC-10
 ]
 
 # ICAO24 hex ranges for military (partial list of known allocators)
@@ -73,6 +111,9 @@ MILITARY_ICAO_PREFIXES = [
     "AF",  # US military
     "43",  # UK military
     "3B",  # French military
+    "73",  # Israeli military
+    "50",  # Saudi military
+    "70",  # Iranian (some blocks)
 ]
 
 

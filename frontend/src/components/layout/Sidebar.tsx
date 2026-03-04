@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/", label: "Tableau de bord", icon: "📡" },
+  { href: "/alerts", label: "Alertes", icon: "🚨" },
   { href: "/feed", label: "Flux brut", icon: "📰" },
   { href: "/markets", label: "Marchés", icon: "📊" },
   { href: "/settings", label: "Paramètres", icon: "⚙️" },
@@ -25,7 +26,9 @@ export function Sidebar() {
       {/* Nav */}
       <nav className="flex-1 py-4 px-2 space-y-1">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/" && pathname.startsWith(item.href));
           return (
             <Link
               key={item.href}
