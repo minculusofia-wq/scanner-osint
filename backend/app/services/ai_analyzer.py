@@ -21,7 +21,7 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 
 SYSTEM_PROMPT = """Tu es un analyste OSINT senior spécialisé dans les marchés prédictifs (Polymarket).
 Tu reçois des clusters de signaux d'intelligence regroupés par catégorie et région.
