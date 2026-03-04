@@ -1,4 +1,4 @@
-"""AI Analyzer — Claude Sonnet integration for actionable intelligence briefs.
+"""AI Analyzer — Google Gemini Flash (gratuit) pour analyse des croisements de sources.
 
 Enriches rule-based briefs with AI-generated:
 - Situation summary (factual)
@@ -6,17 +6,22 @@ Enriches rule-based briefs with AI-generated:
 - Trading signal (concrete recommendation)
 - Confidence level (1-5)
 - Risk factors
+
+Uses Gemini 2.0 Flash via REST API (free tier: 1500 req/day).
+No external SDK needed — uses httpx already in project.
 """
 
 import json
 import logging
 from collections import defaultdict
 
-import anthropic
+import httpx
 
 from app.config import settings
 
 logger = logging.getLogger(__name__)
+
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
 
 SYSTEM_PROMPT = """Tu es un analyste OSINT senior spécialisé dans les marchés prédictifs (Polymarket).
 Tu reçois des clusters de signaux d'intelligence regroupés par catégorie et région.
@@ -37,62 +42,76 @@ Règles:
 
 
 class AIAnalyzer:
-    """Enriches intelligence briefs with Claude Sonnet analysis."""
-
-    def __init__(self):
-        self._client = None
-
-    def _get_client(self) -> anthropic.AsyncAnthropic:
-        if self._client is None:
-            self._client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
-        return self._client
+    """Enriches intelligence briefs with Gemini Flash analysis (free)."""
 
     async def analyze_briefs(
         self,
         briefs: list[dict],
         all_items: list[dict],
     ) -> dict[str, dict]:
-        """Analyze briefs with Claude Sonnet and return AI enrichments.
-
-        Args:
-            briefs: List of brief dicts from BriefGenerator
-            all_items: All recent item dicts (used to find source items per cluster)
+        """Analyze briefs with Gemini Flash and return AI enrichments.
 
         Returns:
             Dict mapping cluster_key to AI analysis fields
         """
-        if not settings.ANTHROPIC_API_KEY:
+        if not settings.GEMINI_API_KEY:
             return {}
 
         if not briefs:
             return {}
 
         # Group items by cluster key for context
-        items_by_cluster = defaultdict(list)
+        items_by_cluster: dict[str, list[dict]] = defaultdict(list)
         for item in all_items:
             key = f"{item.get('category', 'general')}:{item.get('region', 'global') or 'global'}"
             items_by_cluster[key].append(item)
 
-        # Build the user prompt with all clusters
         user_prompt = self._build_prompt(briefs, items_by_cluster)
 
         try:
-            client = self._get_client()
-            message = await client.messages.create(
-                model="claude-sonnet-4-5-20250929",
-                max_tokens=4096,
-                system=SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": user_prompt}],
+            payload = {
+                "system_instruction": {
+                    "parts": [{"text": SYSTEM_PROMPT}]
+                },
+                "contents": [
+                    {"parts": [{"text": user_prompt}]}
+                ],
+                "generationConfig": {
+                    "temperature": 0.3,
+                    "maxOutputTokens": 4096,
+                    "responseMimeType": "application/json",
+                },
+            }
+
+            async with httpx.AsyncClient(timeout=30) as client:
+                resp = await client.post(
+                    GEMINI_URL,
+                    params={"key": settings.GEMINI_API_KEY},
+                    json=payload,
+                )
+
+            if resp.status_code != 200:
+                logger.error(f"Gemini API error {resp.status_code}: {resp.text[:300]}")
+                return {}
+
+            data = resp.json()
+            response_text = (
+                data.get("candidates", [{}])[0]
+                .get("content", {})
+                .get("parts", [{}])[0]
+                .get("text", "")
             )
 
-            response_text = message.content[0].text
-            results = self._parse_response(response_text, briefs)
+            if not response_text:
+                logger.warning("Gemini returned empty response")
+                return {}
 
-            logger.info(f"AI analysis: enriched {len(results)}/{len(briefs)} briefs")
+            results = self._parse_response(response_text, briefs)
+            logger.info(f"AI analysis (Gemini Flash): enriched {len(results)}/{len(briefs)} briefs")
             return results
 
-        except anthropic.APIError as e:
-            logger.error(f"Claude API error: {e}")
+        except httpx.TimeoutException:
+            logger.warning("Gemini API timeout — skipping AI analysis")
             return {}
         except Exception as e:
             logger.error(f"AI analysis failed: {e}", exc_info=True)
@@ -157,9 +176,9 @@ class AIAnalyzer:
     def _parse_response(
         self, response_text: str, briefs: list[dict]
     ) -> dict[str, dict]:
-        """Parse Claude's JSON response into cluster-keyed results."""
-        # Strip any markdown formatting Claude might add despite instructions
+        """Parse Gemini's JSON response into cluster-keyed results."""
         text = response_text.strip()
+        # Strip markdown fences if present
         if text.startswith("```"):
             text = text.split("\n", 1)[-1]
         if text.endswith("```"):

@@ -12,8 +12,8 @@ class Settings(BaseSettings):
     ETHERSCAN_API_KEY: str = ""
     FRED_API_KEY: str = ""
 
-    # AI Analysis (Claude Sonnet)
-    ANTHROPIC_API_KEY: str = ""
+    # AI Analysis (Gemini Flash — free)
+    GEMINI_API_KEY: str = ""
 
     # Alerts
     DISCORD_WEBHOOK_URL: str = ""

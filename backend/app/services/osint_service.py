@@ -270,8 +270,8 @@ class OSINTService:
 
         briefs = self.brief_gen.generate_briefs(item_dicts)
 
-        # 7.1 AI Analysis (Claude Sonnet) — enrich briefs before persist
-        if settings.ANTHROPIC_API_KEY and briefs:
+        # 7.1 AI Analysis (Gemini Flash, free) — enrich briefs before persist
+        if settings.GEMINI_API_KEY and briefs:
             try:
                 ai_results = await self.ai_analyzer.analyze_briefs(briefs, item_dicts)
                 for brief_data in briefs:
