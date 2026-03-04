@@ -26,7 +26,7 @@ function playTone(
   osc.frequency.setValueAtTime(frequency, ctx.currentTime);
 
   gain.gain.setValueAtTime(volume, ctx.currentTime);
-  gain.gain.exponentialRampToValue(0.001, ctx.currentTime + duration);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
 
   osc.connect(gain);
   gain.connect(ctx.destination);
