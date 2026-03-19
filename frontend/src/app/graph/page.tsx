@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Header } from '@/components/layout/Header';
 import KnowledgeGraph from '@/components/KnowledgeGraph';
 import { useIntelligence } from '@/hooks/useIntelligence';
-import { BriefCard } from '@/components/BriefCard';
+import { BriefCard, LOCALIZED_STRINGS } from '@/components/BriefCard';
 import { SignalCard } from '@/components/SignalCard';
 
 export default function GraphPage() {
@@ -51,7 +51,9 @@ export default function GraphPage() {
               }`}
             >
               <div className="flex justify-between items-start mb-1">
-                <span className="text-[10px] font-bold text-indigo-400 uppercase">{brief.category}</span>
+                <span className="text-[10px] font-bold text-indigo-400 uppercase">
+                  {LOCALIZED_STRINGS[brief.category.toLowerCase()] || brief.category}
+                </span>
                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                   brief.urgency === 'critical' ? 'bg-red-500/20 text-red-400' :
                   brief.urgency === 'high' ? 'bg-orange-500/20 text-orange-400' :
@@ -60,7 +62,7 @@ export default function GraphPage() {
                   {brief.priority_score.toFixed(0)}
                 </span>
               </div>
-              <h4 className="text-sm font-medium text-slate-200 line-clamp-2">{brief.title}</h4>
+              <h4 className="text-sm font-medium text-slate-200 line-clamp-2">{brief.ai_title || brief.title}</h4>
             </div>
           ))}
         </div>
@@ -74,7 +76,7 @@ export default function GraphPage() {
           ) : selectedBrief && selectedBrief.graph_data && JSON.parse(selectedBrief.graph_data).nodes?.length > 0 ? (
             <KnowledgeGraph 
               data={JSON.parse(selectedBrief.graph_data)} 
-              title={`Graphique pour: ${selectedBrief.title}`}
+              title={`Graphique pour: ${selectedBrief.ai_title || selectedBrief.title}`}
             />
           ) : (
             <div className="w-full h-[600px] flex flex-col items-center justify-center bg-slate-950 rounded-xl border border-slate-800 text-center p-8">
@@ -93,7 +95,7 @@ export default function GraphPage() {
                 <span className="text-indigo-400">✨</span> Analyse de Signal
               </h3>
               <p className="text-sm text-slate-400 leading-relaxed italic">
-                {selectedBrief.ai_analysis || selectedBrief.summary}
+                {selectedBrief.ai_situation || selectedBrief.ai_analysis || selectedBrief.summary}
               </p>
               {selectedBrief.ai_trading_signal && (
                 <div className="mt-3 p-2 bg-indigo-500/10 border border-indigo-500/20 rounded text-xs text-indigo-300">

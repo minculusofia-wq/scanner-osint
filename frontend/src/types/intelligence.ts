@@ -33,6 +33,7 @@ export interface IntelligenceBrief {
   region: string;
   is_actionable: boolean;
   is_dismissed: boolean;
+  ai_title: string;
   ai_situation: string;
   ai_analysis: string;
   ai_trading_signal: string;

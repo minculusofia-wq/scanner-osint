@@ -32,6 +32,7 @@ class IntelligenceBrief(Base):
     region: Mapped[str] = mapped_column(String(100), default="")
 
     # AI Analysis (Claude Sonnet)
+    ai_title: Mapped[str] = mapped_column(Text, default="")
     ai_situation: Mapped[str] = mapped_column(Text, default="")
     ai_analysis: Mapped[str] = mapped_column(Text, default="")
     ai_trading_signal: Mapped[str] = mapped_column(Text, default="")

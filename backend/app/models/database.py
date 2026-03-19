@@ -33,7 +33,7 @@ async def init_db():
             pass  # Column already exists
 
         # Migrate: add AI analysis columns to intelligence_briefs
-        for col in ["ai_situation", "ai_analysis", "ai_trading_signal", "ai_risk_factors"]:
+        for col in ["ai_title", "ai_situation", "ai_analysis", "ai_trading_signal", "ai_risk_factors"]:
             try:
                 await conn.execute(
                     text(f"ALTER TABLE intelligence_briefs ADD COLUMN {col} TEXT DEFAULT ''")

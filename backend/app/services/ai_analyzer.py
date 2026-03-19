@@ -27,6 +27,7 @@ SYSTEM_PROMPT = """Tu es un analyste OSINT et hedge fund manager senior spécial
 Tu reçois des clusters de signaux d'intelligence brute.
 
 Pour CHAQUE cluster, fournis une analyse d'investissement structurée visant à extraire l'information privilégiée :
+- title: Un titre percutant EN FRANÇAIS (ex: "Frappes imminentes : Alpha sur les prix de l'énergie").
 - situation: Résumé des faits EN FRANÇAIS (2 phrases max).
 - analysis: Quel est l'AVANTAGE (Edge) ici ? EN FRANÇAIS. Que sait-on de plus que le marché public (délai de l'info, corrélation cachée repérée via ADSB/SDR ou mouvements crypto) ?
 - trading_signal: Ta recommandation (YES/NO/HOLD). Si tu as un edge, sois très agressif. Mentionne le marché Polymarket s'il est évident. EN FRANÇAIS.
@@ -34,7 +35,7 @@ Pour CHAQUE cluster, fournis une analyse d'investissement structurée visant à 
 - risk_factors: Qu'est-ce qui pourrait détruire notre "Edge" ? EN FRANÇAIS.
 
 Règles CRITIQUES:
-- Tu DOIS TOUT écrire en FRANÇAIS.
+- Tu DOIS TOUT écrire en FRANÇAIS, y compris le TITRE.
 - Parle comme un trader agressif qui cherche le "Edge" asymétrique. Pas d'informations banales.
 - Ignore complètement les opinions des médias mainstream, concentre-toi sur les données dures (mouvements, radar, crypto).
 - Réponds UNIQUEMENT en JSON valide (format: dict avec les clés de cluster comme IDs), sans markdown, sans backticks.
@@ -285,6 +286,7 @@ class AIAnalyzer:
             if key in parsed and isinstance(parsed[key], dict):
                 entry = parsed[key]
                 results[key] = {
+                    "ai_title": str(entry.get("title", ""))[:150],
                     "ai_situation": str(entry.get("situation", ""))[:1000],
                     "ai_analysis": str(entry.get("analysis", ""))[:1000],
                     "ai_trading_signal": str(entry.get("trading_signal", ""))[:1000],

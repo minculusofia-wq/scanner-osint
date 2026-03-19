@@ -21,6 +21,22 @@ const CONVICTION_COLORS = [
   "bg-red-600",
 ];
 
+export const LOCALIZED_STRINGS: Record<string, string> = {
+  geopolitical: "GÉOPOLITIQUE",
+  financial: "FINANCE",
+  conflict: "CONFLIT",
+  behavioral: "COMPORTEMENT",
+  geoint: "GÉO-INTELLIGENCE",
+  social: "SOCIAL",
+  general: "GÉNÉRAL",
+  global: "MONDE",
+  mena: "MOYEN-ORIENT",
+  latam: "AMÉRIQUE LATINE",
+  apac: "ASIE-PACIFIQUE",
+  eu: "EUROPE",
+  na: "AMÉRIQUE DU NORD",
+};
+
 export function BriefCard({ brief, onDismiss }: BriefCardProps) {
   const confidencePct = Math.round(brief.confidence * 100);
   const hasAI = !!brief.ai_situation;
@@ -32,9 +48,13 @@ export function BriefCard({ brief, onDismiss }: BriefCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <PriorityBadge urgency={brief.urgency} />
-            <span className="text-xs text-gray-500">{brief.category}</span>
+            <span className="text-xs text-slate-500 font-bold tracking-tight">
+              {LOCALIZED_STRINGS[brief.category.toLowerCase()] || brief.category.toUpperCase()}
+            </span>
             {brief.region && (
-              <span className="text-xs text-gray-500">{brief.region}</span>
+              <span className="text-xs text-slate-500">
+                • {LOCALIZED_STRINGS[brief.region.toLowerCase()] || brief.region}
+              </span>
             )}
             {hasAI && (
               <span className="px-1.5 py-0.5 text-[9px] rounded bg-violet-500/15 text-violet-400 border border-violet-500/20 font-medium">
@@ -43,7 +63,7 @@ export function BriefCard({ brief, onDismiss }: BriefCardProps) {
             )}
           </div>
           <h3 className="text-sm font-semibold text-white leading-tight">
-            {brief.title}
+            {brief.ai_title || brief.title}
           </h3>
         </div>
         <div className="flex items-center gap-2 shrink-0">
