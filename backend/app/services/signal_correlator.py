@@ -330,6 +330,32 @@ class SignalCorrelator:
 
         return min(100, density + diversity + sentiment_score + priority_score + accel_bonus)
 
+    def build_knowledge_graph(self, items: list[dict]) -> nx.Graph:
+        """Build a NetworkX graph linking items via shared entities."""
+        G = nx.Graph()
+        for i, item in enumerate(items):
+            item_id = f"item_{item.get('id', i)}"
+            G.add_node(item_id, type="brief", label=item.get("title")[:30]+"...", title=item.get("title"))
+
+            # Extract entities using OntologyMapper
+            entities = self._ontology.extract_entities(item.get("title", "") + " " + item.get("summary", ""))
+            for ent in entities:
+                ent_id = f"ent_{ent.name.lower()}"
+                if not G.has_node(ent_id):
+                    G.add_node(ent_id, type=ent.type.value, label=ent.name, title=ent.name)
+                G.add_edge(item_id, ent_id, type="mentions")
+        return G
+
+    def _graph_to_dict(self, G: nx.Graph) -> dict:
+        """Convert nx.Graph to D3-like JSON format for React Flow / Xyflow."""
+        nodes = []
+        for node_id, data in G.nodes(data=True):
+            nodes.append({"id": node_id, "data": data})
+        edges = []
+        for u, v, data in G.edges(data=True):
+            edges.append({"id": f"{u}-{v}", "source": u, "target": v, "label": data.get("type", "")})
+        return {"nodes": nodes, "edges": edges}
+
     def _extract_keywords(self, items: list[dict], top_n: int = 15) -> list[str]:
         """Extract most frequent meaningful words from item titles."""
         stop_words = {

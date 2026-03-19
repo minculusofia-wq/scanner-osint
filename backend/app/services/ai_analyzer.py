@@ -269,8 +269,14 @@ class AIAnalyzer:
         if text.endswith("```"):
             text = text.rsplit("```", 1)[0]
         text = text.strip()
-
+        # Robust extraction of JSON object
+        if "{" in text:
+            text = text[text.find("{"):]
+        if "}" in text:
+            text = text[:text.rfind("}")+1]
+        
         try:
+            import json
             parsed = json.loads(text)
         except json.JSONDecodeError:
             logger.warning(f"Failed to parse AI response as JSON: {text[:200]}...")
