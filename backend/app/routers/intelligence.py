@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.database import get_db
 from app.services.osint_config_service import OSINTConfigService
 from app.services.osint_service import OSINTService
+from app.schemas.intelligence import OSINTConfig, ChatRequest, ChatResponse
 
 router = APIRouter()
 
