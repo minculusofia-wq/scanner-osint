@@ -4,6 +4,7 @@ import type { IntelligenceBrief } from "@/types/intelligence";
 import { PriorityBadge } from "./PriorityBadge";
 import { MarketLink } from "./MarketLink";
 import { timeAgo } from "@/lib/utils";
+import Link from "next/link";
 
 interface BriefCardProps {
   brief: IntelligenceBrief;
@@ -165,9 +166,25 @@ export function BriefCard({ brief, onDismiss }: BriefCardProps) {
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between text-xs text-gray-500">
-        <span>Priorité : {brief.priority_score.toFixed(0)}</span>
-        <span>{timeAgo(brief.created_at)}</span>
+      <div className="flex items-center justify-between pt-2 border-t border-gray-800/50">
+        <div className="flex items-center gap-3 text-[11px] text-gray-500">
+          <span>Priorité : {brief.priority_score.toFixed(0)}</span>
+          <span>{timeAgo(brief.created_at)}</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link 
+            href={`/chat?q=${encodeURIComponent("Peux-tu m'en dire plus sur : " + brief.title)}`}
+            className="text-[11px] font-medium text-violet-400 hover:text-violet-300 flex items-center gap-1"
+          >
+            Analyser avec l'IA <span>💬</span>
+          </Link>
+          <Link 
+            href={`/graph?briefId=${brief.id}`}
+            className="text-[11px] font-medium text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+          >
+            Visualiser le Graphe <span>→</span>
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -37,6 +37,7 @@ class IntelligenceBrief(Base):
     ai_trading_signal: Mapped[str] = mapped_column(Text, default="")
     ai_confidence: Mapped[int] = mapped_column(Integer, default=0)
     ai_risk_factors: Mapped[str] = mapped_column(Text, default="")
+    graph_data: Mapped[str] = mapped_column(Text, default="{}")
 
     # Status
     is_actionable: Mapped[bool] = mapped_column(Boolean, default=False)

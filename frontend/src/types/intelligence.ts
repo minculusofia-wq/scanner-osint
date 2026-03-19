@@ -40,6 +40,7 @@ export interface IntelligenceBrief {
   ai_risk_factors: string;
   created_at: string;
   expires_at: string | null;
+  graph_data: string; // JSON string of {nodes, edges}
 }
 
 export interface LinkedMarket {

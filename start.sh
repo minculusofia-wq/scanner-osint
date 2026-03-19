@@ -25,6 +25,16 @@ sleep 1
 # Start backend
 echo "[2/4] Lancement du backend (port 8001)..."
 cd "$BACKEND_DIR"
+
+if [ ! -d "venv" ]; then
+    echo "  Creation de l'environnement virtuel et installation des dependances..."
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt > "$LOG_DIR/pip-install.log" 2>&1
+else
+    source venv/bin/activate
+fi
+
 python3 -m uvicorn app.main:app --port 8001 --host 0.0.0.0 > "$LOG_DIR/backend.log" 2>&1 &
 BACKEND_PID=$!
 echo "  Backend PID: $BACKEND_PID"

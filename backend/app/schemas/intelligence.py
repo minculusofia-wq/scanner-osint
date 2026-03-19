@@ -40,6 +40,7 @@ class IntelligenceBriefResponse(BaseModel):
     is_dismissed: bool = False
     created_at: datetime
     expires_at: datetime | None = None
+    graph_data: dict = {}
 
 
 class OSINTConfig(BaseModel):
@@ -177,3 +178,15 @@ class AlertHistoryResponse(BaseModel):
     delivery_status: str
     linked_markets: list[dict] = []
     created_at: datetime
+
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+class ChatRequest(BaseModel):
+    message: str
+    history: list[ChatMessage] = []
+
+class ChatResponse(BaseModel):
+    response: str

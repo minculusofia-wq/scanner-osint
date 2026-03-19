@@ -5,11 +5,13 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/", label: "Tableau de bord", icon: "📡" },
+  { href: "/", label: "Alpha Terminal", icon: "📡" },
+  { href: "/chat", label: "Assistant IA", icon: "💬" },
   { href: "/alerts", label: "Alertes", icon: "🚨" },
   { href: "/feed", label: "Flux brut", icon: "📰" },
+  { href: "/graph", label: "Analyse Graphe", icon: "🕸️" },
   { href: "/markets", label: "Marchés", icon: "📊" },
-  { href: "/settings", label: "Paramètres", icon: "⚙️" },
+  { href: "/settings", label: "Configuration", icon: "⚙️" },
 ];
 
 export function Sidebar() {

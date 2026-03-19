@@ -313,6 +313,7 @@ class OSINTService:
                 ai_trading_signal=brief_data.get("ai_trading_signal", ""),
                 ai_confidence=brief_data.get("ai_confidence", 0),
                 ai_risk_factors=brief_data.get("ai_risk_factors", ""),
+                graph_data=json.dumps(brief_data.get("graph_data", {})),
                 created_at=datetime.utcnow(),
                 expires_at=expires_at,
             )
@@ -325,6 +326,19 @@ class OSINTService:
         try:
             correlation_results = await self.correlator.correlate(db)
             stats["correlations"] = len(correlation_results)
+
+            # Back-fill graph data into briefs matching the region/category
+            for res in correlation_results:
+                # Find the brief that matches this region/category
+                stmt = (
+                    update(IntelligenceBrief)
+                    .where(
+                        IntelligenceBrief.region == res.region,
+                        IntelligenceBrief.is_dismissed == False,
+                    )
+                    .values(graph_data=json.dumps(res.graph_data))
+                )
+                await db.execute(stmt)
         except Exception as e:
             logger.error(f"Signal correlation failed: {e}", exc_info=True)
             correlation_results = []

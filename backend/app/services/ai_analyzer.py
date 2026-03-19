@@ -23,22 +23,39 @@ logger = logging.getLogger(__name__)
 
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 
-SYSTEM_PROMPT = """Tu es un analyste OSINT senior spécialisé dans les marchés prédictifs (Polymarket).
-Tu reçois des clusters de signaux d'intelligence regroupés par catégorie et région.
+SYSTEM_PROMPT = """Tu es un analyste OSINT et hedge fund manager senior spécialisé dans l'avantage informationnel ("Edge" / Alpha) sur les marchés prédictifs (Polymarket).
+Tu reçois des clusters de signaux d'intelligence brute.
 
-Pour CHAQUE cluster, fournis une analyse investissement structurée :
-- situation: Résumé factuel en 2-3 phrases. Quoi, qui, où, quand. Pas de spéculation.
-- analysis: Pourquoi c'est important pour les marchés. Implications géopolitiques, financières, ou sociales. Impact probable sur Polymarket. 2-3 phrases.
-- trading_signal: Recommandation concrète. Direction (YES ou NO) sur quel type de marché, avec raisonnement clair. Si un marché Polymarket est lié, mentionne-le directement.
-- confidence: Conviction de 1 à 5 (1=signal faible/incertain, 3=modéré, 5=très haute conviction).
-- risk_factors: 1-2 facteurs qui pourraient invalider ton analyse.
+Pour CHAQUE cluster, fournis une analyse d'investissement structurée visant à extraire l'information privilégiée :
+- situation: Résumé des faits EN FRANÇAIS (2 phrases max).
+- analysis: Quel est l'AVANTAGE (Edge) ici ? EN FRANÇAIS. Que sait-on de plus que le marché public (délai de l'info, corrélation cachée repérée via ADSB/SDR ou mouvements crypto) ?
+- trading_signal: Ta recommandation (YES/NO/HOLD). Si tu as un edge, sois très agressif. Mentionne le marché Polymarket s'il est évident. EN FRANÇAIS.
+- confidence: Conviction de 1 à 5 (1=bruit/connu de tous, 3=edge possible, 5=information hautement privilégiée/asymétrique).
+- risk_factors: Qu'est-ce qui pourrait détruire notre "Edge" ? EN FRANÇAIS.
 
-Règles:
-- Sois DIRECT et CONCIS. Pas de disclaimers, pas de "il est important de noter".
-- Parle comme un trader à un autre trader.
-- Si les signaux sont contradictoires ou trop faibles, dis-le franchement avec confidence=1-2.
-- Priorise les signaux provenant de sources officielles (gov_rss, sec_edgar) et données terrain (adsb, acled, ship_tracker) par rapport aux sources média (gdelt, newsdata, reddit).
-- Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks."""
+Règles CRITIQUES:
+- Tu DOIS TOUT écrire en FRANÇAIS.
+- Parle comme un trader agressif qui cherche le "Edge" asymétrique. Pas d'informations banales.
+- Ignore complètement les opinions des médias mainstream, concentre-toi sur les données dures (mouvements, radar, crypto).
+- Réponds UNIQUEMENT en JSON valide (format: dict avec les clés de cluster comme IDs), sans markdown, sans backticks.
+"""
+
+ENTITY_EXTRACTION_PROMPT = """Extraite toutes les entités importantes de cette alerte OSINT pour une base de connaissance "façon Palantir".
+
+Liste les:
+- persons: Nom complet si possible.
+- organizations: Entreprises, agences gouvernementales, groupes militaires/rebelles.
+- locations: Pays, villes, régions précises, sites stratégiques.
+- assets: Tickers boursiers (ex: AAPL), IDs d'avions (ICAO/Tail), IDs de navires (IMO), Wallets Crypto.
+- events: Type d'action (ex: missile_strike, merger_rumor, whale_transfer).
+
+Produis un JSON structuré:
+{
+  "entities": [{"name": "...", "type": "person|organization|location|asset|event", "metadata": {}}],
+  "relationships": [{"source": "...", "target": "...", "type": "mentions|located_in|owned_by|attacked|operates", "confidence": 0.0}]
+}
+
+Réponds UNIQUEMENT en JSON valide."""
 
 
 class AIAnalyzer:
@@ -120,6 +137,65 @@ class AIAnalyzer:
         except Exception as e:
             logger.error(f"AI analysis failed: {e}", exc_info=True)
             return {}
+
+    async def extract_entities(self, item_title: str, item_summary: str) -> dict:
+        """Extract structured entities and relationships from a single item.
+
+        Returns:
+            Dict with 'entities' and 'relationships' keys.
+        """
+        if not settings.GEMINI_API_KEY:
+            return {"entities": [], "relationships": []}
+
+        prompt = f"Titre: {item_title}\nRésumé: {item_summary}"
+
+        try:
+            payload = {
+                "system_instruction": {"parts": [{"text": ENTITY_EXTRACTION_PROMPT}]},
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {
+                    "temperature": 0.1,
+                    "maxOutputTokens": 1024,
+                    "responseMimeType": "application/json",
+                },
+            }
+
+            async with httpx.AsyncClient(timeout=10) as client:
+                resp = await client.post(
+                    GEMINI_URL,
+                    params={"key": settings.GEMINI_API_KEY},
+                    json=payload,
+                )
+
+            if resp.status_code != 200:
+                return {"entities": [], "relationships": []}
+
+            data = resp.json()
+            response_text = (
+                data.get("candidates", [{}])[0]
+                .get("content", {})
+                .get("parts", [{}])[0]
+                .get("text", "")
+            )
+
+            if not response_text:
+                return {"entities": [], "relationships": []}
+
+            # Parse and sanitize
+            text = response_text.strip()
+            if text.startswith("```"):
+                text = text.split("\n", 1)[-1]
+            if text.endswith("```"):
+                text = text.rsplit("```", 1)[0]
+            
+            parsed = json.loads(text.strip())
+            return {
+                "entities": parsed.get("entities", []),
+                "relationships": parsed.get("relationships", []),
+            }
+        except Exception as e:
+            logger.debug(f"Entity extraction failed: {e}")
+            return {"entities": [], "relationships": []}
 
     def _build_prompt(
         self,
@@ -217,3 +293,73 @@ class AIAnalyzer:
                 }
 
         return results
+
+    async def generate_chat_response(
+        self, message: str, history: list[dict], context_briefs: list[dict]
+    ) -> str:
+        """Engage in a conversational chat using the OSINT briefs as context."""
+        if not settings.GEMINI_API_KEY:
+            return "Erreur : La clé API Gemini n'est pas configurée dans le backend."
+
+        system_prompt = (
+            "Tu es l'assistant de l'Alpha Terminal (Scanner OSINT). "
+            "Tu es un expert en analyse géopolitique, renseignement terrain (SDR/ADSB) et marchés prédictifs.\n"
+            "CONTEXTE ACTUEL (Dernières alertes) :\n"
+        )
+        
+        for b in context_briefs[:15]:
+            system_prompt += f"- [{b.get('category')} / {b.get('region')}] {b.get('title')}\n  Infos: {b.get('summary')}\n  Edge: {b.get('ai_analysis')}\n  Signal: {b.get('ai_trading_signal')}\n\n"
+            
+        system_prompt += (
+            "RÈGLES :\n"
+            "1. Tu DOIS toujours répondre en FRANÇAIS.\n"
+            "2. Si l'utilisateur pose une question sur un événement récent, base-toi sur le CONTEXTE ACTUEL.\n"
+            "3. Sois concis, analytique, et oriente toujours tes réponses pour trouver 'l'Edge' d'investissement (Polymarket, Crypto, Bourse).\n"
+            "4. Tu peux utiliser du Markdown pour formater ta réponse."
+        )
+
+        contents = []
+        for msg in history:
+            role = "user" if msg["role"] == "user" else "model"
+            contents.append({
+                "role": role,
+                "parts": [{"text": msg["content"]}]
+            })
+        
+        contents.append({
+            "role": "user",
+            "parts": [{"text": message}]
+        })
+
+        try:
+            payload = {
+                "system_instruction": {"parts": [{"text": system_prompt}]},
+                "contents": contents,
+                "generationConfig": {
+                    "temperature": 0.4,
+                    "maxOutputTokens": 2048,
+                },
+            }
+
+            async with httpx.AsyncClient(timeout=30) as client:
+                resp = await client.post(
+                    GEMINI_URL,
+                    params={"key": settings.GEMINI_API_KEY},
+                    json=payload,
+                )
+
+            if resp.status_code != 200:
+                return f"Erreur API Gemini : {resp.status_code} - {resp.text}"
+                
+            data = resp.json()
+            response_text = (
+                data.get("candidates", [{}])[0]
+                .get("content", {})
+                .get("parts", [{}])[0]
+                .get("text", "Désolé, je n'ai pas de réponse.")
+            )
+            return response_text
+            
+        except Exception as e:
+            logger.error(f"Chat generation failed: {e}", exc_info=True)
+            return "Erreur de connexion au modèle IA."

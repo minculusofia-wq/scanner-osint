@@ -13,6 +13,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.intelligence_item import IntelligenceItem
 from app.services.precursor_patterns import PatternMatch, PrecursorPatternMatcher
+from app.services.ontology_mapper import OntologyMapper, EntityType
+import networkx as nx
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +90,7 @@ class CorrelationResult:
     dominant_category: str = ""
     countries: list[str] = field(default_factory=list)
     keywords: list[str] = field(default_factory=list)
+    graph_data: dict = field(default_factory=dict)  # Nodes and edges for frontend
 
 
 class SignalCorrelator:
@@ -98,6 +101,7 @@ class SignalCorrelator:
 
     def __init__(self):
         self._pattern_matcher = PrecursorPatternMatcher()
+        self._ontology = OntologyMapper()
 
     async def correlate(self, db: AsyncSession) -> list[CorrelationResult]:
         now = datetime.utcnow()
@@ -146,10 +150,13 @@ class SignalCorrelator:
         results = []
         cutoff_1h = now - timedelta(hours=1)
         cutoff_6h = now - timedelta(hours=6)
-
         for region, group_items in region_groups.items():
             if len(group_items) < self.MIN_CORRELATION_SIGNALS:
                 continue
+
+            # --- Graph Correlation (Palantir approach) ---
+            G = self.build_knowledge_graph(group_items)
+            graph_data = self._graph_to_dict(G)
 
             # Compute time-windowed stats
             items_1h = [i for i in group_items if i["created_at"] >= cutoff_1h]

@@ -35,6 +35,48 @@ async def list_briefs(
     return await _osint_service.get_briefs(db, limit, actionable_only)
 
 
+@router.get("/predictions/")
+async def list_predictions(
+    min_confidence: int = 3,
+    limit: int = 10,
+    db: AsyncSession = Depends(get_db),
+):
+    """Endpoint for the trading bot to get structured AI signals."""
+    briefs = await _osint_service.get_briefs(db, limit=limit, actionable_only=True)
+    predictions = []
+    for b in briefs:
+        if b.get("ai_confidence", 0) >= min_confidence:
+            predictions.append({
+                "id": b["id"],
+                "title": b["title"],
+                "signal": b["ai_trading_signal"],
+                "confidence": b["ai_confidence"],
+                "urgency": b["urgency"],
+                "category": b["category"],
+                "region": b["region"],
+                "markets": [m["condition_id"] for m in b["linked_markets"]],
+                "timestamp": b["created_at"],
+            })
+    return predictions
+
+
+@router.post("/chat", response_model=ChatResponse)
+async def chat_with_ai(
+    req: ChatRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """Interact with the Alpha Terminal Assistant."""
+    briefs = await _osint_service.get_briefs(db, limit=20, actionable_only=False)
+    history_dicts = [{"role": m.role, "content": m.content} for m in req.history]
+    
+    reply = await _osint_service.ai_analyzer.generate_chat_response(
+        message=req.message,
+        history=history_dicts,
+        context_briefs=briefs
+    )
+    return ChatResponse(response=reply)
+
+
 @router.post("/briefs/{brief_id}/dismiss")
 async def dismiss_brief(
     brief_id: int,

@@ -81,8 +81,8 @@ export default function DashboardPage() {
           {activeEscalations.length > 0 && (
             <section>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-red-400 uppercase tracking-wider">
-                  Escalades actives ({activeEscalations.length})
+                <h3 className="text-sm font-semibold text-red-500 uppercase tracking-wider">
+                  🚨 Alertes d'Escalade ({activeEscalations.length})
                 </h3>
                 <Link
                   href="/alerts"
@@ -99,12 +99,14 @@ export default function DashboardPage() {
             </section>
           )}
 
-          {/* Actionable Signals */}
+          {/* Actionable Signals (The Edge) */}
           {actionableBriefs.length > 0 && (
             <section>
-              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                Signaux actionnables ({actionableBriefs.length})
-              </h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-indigo-400 uppercase tracking-wider flex items-center gap-2">
+                  ✨ Alpha & Informations Privilégiées ({actionableBriefs.length})
+                </h3>
+              </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {actionableBriefs.map((brief) => (
                   <BriefCard
@@ -120,26 +122,12 @@ export default function DashboardPage() {
           {/* All Briefs */}
           {briefs.length > 0 && (
             <section>
-              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                Résumés de renseignement ({briefs.length})
+              <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">
+                Radar d'Intelligence (Signaux en formation)
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                 {briefs.filter(b => !b.is_actionable).map((brief) => (
                   <SignalCard key={brief.id} brief={brief} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Top Alerts */}
-          {topItems.length > 0 && (
-            <section>
-              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                Alertes haute priorité
-              </h3>
-              <div className="space-y-2">
-                {topItems.map((item) => (
-                  <ItemCard key={item.id} item={item} />
                 ))}
               </div>
             </section>

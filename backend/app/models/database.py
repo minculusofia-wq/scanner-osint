@@ -47,6 +47,13 @@ async def init_db():
         except Exception:
             pass
 
+        try:
+            await conn.execute(
+                text("ALTER TABLE intelligence_briefs ADD COLUMN graph_data TEXT DEFAULT '{}'")
+            )
+        except Exception:
+            pass
+
 
 async def get_db():
     async with async_session() as session:

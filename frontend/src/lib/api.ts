@@ -60,6 +60,17 @@ export const fetchConfig = () =>
 export const updateConfig = (data: Partial<OSINTConfig>) =>
   api.put<OSINTConfig>("/intelligence/config", data).then((r) => r.data);
 
+// --- AI Chat ---
+export interface ChatMessage {
+  role: "user" | "model";
+  content: string;
+}
+
+export const chatWithAI = (message: string, history: ChatMessage[]) =>
+  api
+    .post<{ response: string }>("/intelligence/chat", { message, history })
+    .then((r) => r.data.response);
+
 // --- Alerts / Early Warning ---
 
 export const fetchEscalations = (activeOnly = true) =>
