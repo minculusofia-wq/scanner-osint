@@ -87,10 +87,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from app.routers import intelligence, alerts  # noqa: E402
+from app.routers import intelligence, alerts, notebooklm  # noqa: E402
 
 app.include_router(intelligence.router, prefix="/api/intelligence", tags=["intelligence"])
 app.include_router(alerts.router, prefix="/api/alerts", tags=["alerts"])
+app.include_router(notebooklm.router, prefix="/api/notebooklm", tags=["notebooklm"])
+
 
 
 @app.get("/health")

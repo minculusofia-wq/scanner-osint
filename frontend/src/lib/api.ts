@@ -113,3 +113,10 @@ export const sendTestAlert = () =>
 
 export const fetchPatterns = () =>
   api.get<PrecursorPattern[]>("/alerts/patterns").then((r) => r.data);
+
+// --- NotebookLM ---
+export const fetchNotebookStatus = () =>
+  api.get<{ is_ready: boolean; message: string }>("/notebooklm/status").then((r) => r.data);
+
+export const generateNotebookPodcast = () =>
+  api.post<{ success: boolean; notebook_url: string; message: string }>("/notebooklm/generate-deep-dive").then((r) => r.data);

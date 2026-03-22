@@ -9,6 +9,7 @@ import { SignalCard } from "@/components/SignalCard";
 import { ItemCard } from "@/components/ItemCard";
 import { EscalationCard } from "@/components/EscalationCard";
 import { dismissBrief, fetchEscalations } from "@/lib/api";
+import { NotebookLMControl } from "@/components/NotebookLMControl";
 import type { EscalationTracker } from "@/types/intelligence";
 import Link from "next/link";
 
@@ -77,6 +78,9 @@ export default function DashboardPage() {
         </div>
       ) : (
         <>
+          {/* NotebookLM Export */}
+          <NotebookLMControl />
+
           {/* Escalation Banner */}
           {activeEscalations.length > 0 && (
             <section>
