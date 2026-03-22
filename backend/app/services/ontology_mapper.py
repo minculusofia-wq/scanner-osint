@@ -55,6 +55,18 @@ class OntologyMapper:
                 entities.append(Entity(name=tag, type=EntityType.EVENT))
         return entities
 
+    def extract_entities(self, text: str) -> List[Entity]:
+        """Extract entities from raw text using simple heuristics (for now)."""
+        entities = []
+        # Simple strategy: look for capitalized words as potential entities
+        words = text.split()
+        for word in words:
+            word = word.strip(".,;:!?()[]\"'")
+            if len(word) > 3 and any(c.isupper() for c in word):
+                entities.append(Entity(name=word, type=EntityType.ORGANIZATION))
+        
+        return self.consolidate_entities(entities)
+
     def consolidate_entities(self, entities: List[Entity]) -> List[Entity]:
         """Remove duplicates and standardize names."""
         unique = {}
