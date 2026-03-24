@@ -48,7 +48,8 @@ class NotebookLMService:
                 "NotebookLM non connecté. Lancez 'notebooklm login' dans votre terminal."
             )
 
-        self._client = await NotebookLMClient.from_storage()
+        client = await NotebookLMClient.from_storage()
+        self._client = await client.__aenter__()
         return self._client
 
     async def _get_or_create_notebook(self) -> str:
@@ -164,7 +165,10 @@ class NotebookLMService:
 
     async def close(self):
         """Clean up client resources."""
-        if self._client and hasattr(self._client, "close"):
-            await self._client.close()
+        if self._client:
+            try:
+                await self._client.__aexit__(None, None, None)
+            except Exception:
+                pass
         self._client = None
         self._notebook_id = None
