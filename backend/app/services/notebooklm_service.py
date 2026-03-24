@@ -106,8 +106,9 @@ class NotebookLMService:
             instructions="Analyse en français les signaux OSINT. Style: analyste géopolitique agressif cherchant l'edge trading.",
             language="fr",
         )
-        await client.artifacts.wait_for_completion(nb_id, status.task_id, timeout=300)
-        logger.info(f"Podcast generated for notebook {nb_id}")
+        # Don't wait — audio generation takes 5-10min on Google's side
+        # The user can open the notebook URL to listen when ready
+        logger.info(f"Podcast generation triggered for notebook {nb_id} (task: {status.task_id})")
 
         return f"https://notebooklm.google.com/notebook/{nb_id}"
 
