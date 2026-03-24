@@ -2,14 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.database import get_db
-from app.services.osint_config_service import OSINTConfigService
-from app.services.osint_service import OSINTService
+from app.services.instances import osint_service as _osint_service, config_service as _config_service
 from app.schemas.intelligence import OSINTConfig, ChatRequest, ChatResponse
 
 router = APIRouter()
-
-_osint_service = OSINTService()
-_config_service = OSINTConfigService()
 
 
 @router.get("/items/")
@@ -118,13 +114,8 @@ async def get_config(
 
 @router.put("/config")
 async def update_config(
-    data: dict,
+    data: OSINTConfig,
     db: AsyncSession = Depends(get_db),
 ):
     """Update OSINT configuration."""
-    from app.schemas.intelligence import OSINTConfig
-    current = await _config_service.get_config(db)
-    updated_data = current.model_dump()
-    updated_data.update(data)
-    new_config = OSINTConfig(**updated_data)
-    return (await _config_service.update_config(db, new_config)).model_dump()
+    return (await _config_service.update_config(db, data)).model_dump()

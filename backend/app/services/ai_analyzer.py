@@ -13,6 +13,7 @@ No external SDK needed — uses httpx already in project.
 
 import json
 import logging
+import re
 from collections import defaultdict
 
 import httpx
@@ -20,6 +21,16 @@ import httpx
 from app.config import settings
 
 logger = logging.getLogger(__name__)
+
+
+def _sanitize_for_prompt(text: str, max_len: int = 200) -> str:
+    """Strip control characters and truncate to prevent prompt injection."""
+    if not text:
+        return ""
+    cleaned = re.sub(r"[\n\r\t]+", " ", text)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    return cleaned[:max_len]
+
 
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 
@@ -316,7 +327,15 @@ class AIAnalyzer:
         )
         
         for b in context_briefs[:15]:
-            system_prompt += f"- [{b.get('category')} / {b.get('region')}] {b.get('title')}\n  Infos: {b.get('summary')}\n  Edge: {b.get('ai_analysis')}\n  Signal: {b.get('ai_trading_signal')}\n\n"
+            title = _sanitize_for_prompt(b.get('title', ''), 150)
+            summary = _sanitize_for_prompt(b.get('summary', ''), 300)
+            analysis = _sanitize_for_prompt(b.get('ai_analysis', ''), 300)
+            signal = _sanitize_for_prompt(b.get('ai_trading_signal', ''), 200)
+            system_prompt += (
+                f"<source_brief>[{b.get('category')} / {b.get('region')}] "
+                f"{title} | Info: {summary} | Edge: {analysis} | Signal: {signal}"
+                f"</source_brief>\n"
+            )
             
         system_prompt += (
             "RÈGLES :\n"

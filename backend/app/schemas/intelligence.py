@@ -40,7 +40,7 @@ class IntelligenceBriefResponse(BaseModel):
     is_dismissed: bool = False
     created_at: datetime
     expires_at: datetime | None = None
-    graph_data: dict = {}
+    graph_data: str = "{}"
 
 
 class OSINTConfig(BaseModel):

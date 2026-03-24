@@ -171,14 +171,10 @@ async def get_alert_config(db: AsyncSession = Depends(get_db)):
 
 @router.put("/config")
 async def update_alert_config(
-    data: dict,
+    data: AlertConfigSchema,
     db: AsyncSession = Depends(get_db),
 ):
-    current = await _config_service.get_config(db)
-    updated_data = current.model_dump()
-    updated_data.update(data)
-    new_config = AlertConfigSchema(**updated_data)
-    result = await _config_service.update_config(db, new_config)
+    result = await _config_service.update_config(db, data)
     return result.model_dump()
 
 

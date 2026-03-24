@@ -37,9 +37,6 @@ LEVEL_EMOJI = {
 class AlertDelivery:
     """Dispatches alerts to configured channels."""
 
-    def __init__(self):
-        self._http = httpx.AsyncClient(timeout=15)
-
     async def send_discord(
         self,
         webhook_url: str,
@@ -152,7 +149,8 @@ class AlertDelivery:
         }
 
         try:
-            resp = await self._http.post(webhook_url, json=payload)
+            async with httpx.AsyncClient(timeout=15) as client:
+                resp = await client.post(webhook_url, json=payload)
             if resp.status_code in (200, 204):
                 logger.info(f"Discord alert sent: {title}")
                 return True
@@ -206,9 +204,10 @@ class AlertDelivery:
             headers["X-Signature-256"] = f"sha256={signature}"
 
         try:
-            resp = await self._http.post(
-                webhook_url, content=body, headers=headers
-            )
+            async with httpx.AsyncClient(timeout=15) as client:
+                resp = await client.post(
+                    webhook_url, content=body, headers=headers
+                )
             if resp.status_code < 300:
                 logger.info(f"Webhook alert sent: {title}")
                 return True

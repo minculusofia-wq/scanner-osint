@@ -7,14 +7,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.models.database import init_db, async_session
-from app.services.osint_config_service import OSINTConfigService
-from app.services.osint_service import OSINTService
+from app.services.instances import osint_service, config_service
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
-
-osint_service = OSINTService()
-config_service = OSINTConfigService()
 
 
 async def _collection_loop():

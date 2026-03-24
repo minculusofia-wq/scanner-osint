@@ -282,9 +282,10 @@ class OSINTService:
             except Exception as e:
                 logger.error(f"AI analysis failed (non-blocking): {e}")
 
-        # Delete dismissed briefs and regenerate active ones
+        # Delete dismissed briefs; only replace active ones if new briefs were generated
         await db.execute(delete(IntelligenceBrief).where(IntelligenceBrief.is_dismissed == True))
-        await db.execute(delete(IntelligenceBrief).where(IntelligenceBrief.is_dismissed == False))
+        if briefs:
+            await db.execute(delete(IntelligenceBrief).where(IntelligenceBrief.is_dismissed == False))
 
         for brief_data in briefs:
             expires_at = None
@@ -585,6 +586,7 @@ class OSINTService:
             "ai_trading_signal": brief.ai_trading_signal or "",
             "ai_confidence": brief.ai_confidence or 0,
             "ai_risk_factors": brief.ai_risk_factors or "",
+            "graph_data": brief.graph_data or "{}",
             "created_at": brief.created_at.isoformat() if brief.created_at else None,
             "expires_at": brief.expires_at.isoformat() if brief.expires_at else None,
         }

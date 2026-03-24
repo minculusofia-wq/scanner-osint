@@ -1,8 +1,12 @@
+import logging
+
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 engine = create_async_engine(settings.DATABASE_URL, echo=False)
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -29,8 +33,8 @@ async def init_db():
             await conn.execute(
                 text("ALTER TABLE escalation_trackers ADD COLUMN key_headlines TEXT DEFAULT '[]'")
             )
-        except Exception:
-            pass  # Column already exists
+        except Exception as e:
+            logger.debug("Migration key_headlines: %s", e)
 
         # Migrate: add AI analysis columns to intelligence_briefs
         for col in ["ai_title", "ai_situation", "ai_analysis", "ai_trading_signal", "ai_risk_factors"]:
@@ -38,21 +42,21 @@ async def init_db():
                 await conn.execute(
                     text(f"ALTER TABLE intelligence_briefs ADD COLUMN {col} TEXT DEFAULT ''")
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug("Migration %s: %s", col, e)
         try:
             await conn.execute(
                 text("ALTER TABLE intelligence_briefs ADD COLUMN ai_confidence INTEGER DEFAULT 0")
             )
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug("Migration ai_confidence: %s", e)
 
         try:
             await conn.execute(
                 text("ALTER TABLE intelligence_briefs ADD COLUMN graph_data TEXT DEFAULT '{}'")
             )
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug("Migration graph_data: %s", e)
 
 
 async def get_db():

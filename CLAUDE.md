@@ -1,7 +1,7 @@
 # Project Documentation (Auto-generated)
 
 > This file is automatically updated by Claude Code hooks.
-> Last updated: 2026-03-04 10:07:29
+> Last updated: 2026-03-24 11:26:18
 
 ## Project Structure
 
@@ -32,7 +32,6 @@
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/is-bigint
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/is-typed-array
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/jiti
-/Users/anthony/Desktop/scanner osint/frontend/node_modules/language-tags
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/loose-envify
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/math-intrinsics
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/ms
@@ -54,6 +53,7 @@
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/tinyglobby
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/ts-api-utils
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/tsconfig-paths
+/Users/anthony/Desktop/scanner osint/frontend/node_modules/use-sync-external-store
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/which-boxed-primitive
 /Users/anthony/Desktop/scanner osint/frontend/postcss.config.mjs
 ```
@@ -64,14 +64,26 @@
 
 ### FastAPI Routes
 ```python
+@router.get("/escalations")
+@router.get("/history")
+@router.get("/rules")
+@router.post("/rules")
+@router.put("/rules/{rule_id}")
+@router.delete("/rules/{rule_id}")
+@router.get("/config")
+@router.put("/config")
+@router.post("/test")
+@router.get("/patterns")
+@router.get("/status")
+@router.post("/generate-deep-dive")
 @router.get("/items/")
 @router.get("/briefs/")
+@router.get("/predictions/")
+@router.post("/chat", response_model=ChatResponse)
 @router.post("/briefs/{brief_id}/dismiss")
 @router.post("/collect")
 @router.get("/stats")
 @router.get("/config")
-@router.put("/config")
-@app.get("/health")
 ```
 
 ## Database
@@ -79,7 +91,11 @@
 ### SQLAlchemy Models
 ```python
 class Settings(BaseSettings):
+class AlertRule(Base):
 class Base(DeclarativeBase):
+class AlertHistory(Base):
+class EscalationTracker(Base):
+class AlertConfigRecord(Base):
 class OSINTConfigRecord(Base):
 class IntelligenceBrief(Base):
 class IntelligenceItem(Base):
@@ -87,12 +103,8 @@ class IntelligenceItemResponse(BaseModel):
 class IntelligenceBriefResponse(BaseModel):
 class OSINTConfig(BaseModel):
 class IntelligenceStats(BaseModel):
-class NASAFirmsCollector(BaseCollector):
-class ACLEDCollector(BaseCollector):
-class RedditCollector(BaseCollector):
-class ShipTrackerCollector(BaseCollector):
-class NewsDataCollector(BaseCollector):
-class ADSBCollector(BaseCollector):
+class AlertConfigSchema(BaseModel):
+class AlertRuleSchema(BaseModel):
 ```
 
 ## Key Files
@@ -108,9 +120,32 @@ This appears to be a trading bot project. Key patterns detected:
 - Risk management
 - Redis for caching/pub-sub
 - PostgreSQL database
-- Knowledge Graph (NetworkX) for entity correlation
-- LLM-based Entity Extraction (Gemini)
-- Predictions API for external trading bots
+
+## Recent Session Activity
+
+### Session Summary: scanner osint
+*2026-03-04*
+Recent Commits:
+- 91a931e fix: switch to gemini-2.5-flash (2.0-flash quota blocked)
+- 57fdd44 fix: syntax error in ai_analyzer f-string with escaped quotes
+- a65a49a fix: handle Gemini 429 rate limit gracefully in AI analyzer
+- 8f947c9 refactor: switch AI analysis from Claude Sonnet to Gemini Flash...
+
+### Session Summary: scanner osint
+*2026-03-04*
+Recent Commits:
+- 57fdd44 fix: syntax error in ai_analyzer f-string with escaped quotes
+- a65a49a fix: handle Gemini 429 rate limit gracefully in AI analyzer
+- 8f947c9 refactor: switch AI analysis from Claude Sonnet to Gemini Flash (free)
+- 8a03191 feat: integrate Claude Sonnet AI for actionable...
+
+### Session Summary: scanner osint
+*2026-03-04*
+Recent Commits:
+- 57fdd44 fix: syntax error in ai_analyzer f-string with escaped quotes
+- a65a49a fix: handle Gemini 429 rate limit gracefully in AI analyzer
+- 8f947c9 refactor: switch AI analysis from Claude Sonnet to Gemini Flash (free)
+- 8a03191 feat: integrate Claude Sonnet AI for actionable...
 
 ## Instructions for Claude
 
