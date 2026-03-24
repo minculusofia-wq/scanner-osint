@@ -119,4 +119,17 @@ export const fetchNotebookStatus = () =>
   api.get<{ is_ready: boolean; message: string }>("/notebooklm/status").then((r) => r.data);
 
 export const generateNotebookPodcast = () =>
-  api.post<{ success: boolean; notebook_url: string; message: string }>("/notebooklm/generate-deep-dive").then((r) => r.data);
+  api.post<{ success: boolean; notebook_url: string; message: string }>("/notebooklm/generate-deep-dive", {}, { timeout: 120000 }).then((r) => r.data);
+
+export const generateNotebookMindMap = () =>
+  api.post<{ success: boolean; mind_map: Record<string, unknown>; message: string }>("/notebooklm/generate-mind-map", {}, { timeout: 120000 }).then((r) => r.data);
+
+export const generateNotebookDataTable = () =>
+  api.post("/notebooklm/generate-data-table", {}, { timeout: 120000, responseType: "blob" }).then((r) => {
+    const url = window.URL.createObjectURL(new Blob([r.data]));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "alpha_signals.csv";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  });
