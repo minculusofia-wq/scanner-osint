@@ -116,28 +116,10 @@ class NotebookLMService:
         client = await self._get_client()
         nb_id = notebook_id or await self._get_or_create_notebook()
 
-        status = await client.artifacts.generate_mind_map(
-            nb_id,
-            custom_prompt="Crée une mind map des entités clés (personnes, organisations, lieux, événements) et leurs relations.",
-            language="fr",
-        )
-
-        task_id = status.task_id if hasattr(status, "task_id") else status.get("task_id", "")
-        if task_id:
-            await client.artifacts.wait_for_completion(nb_id, task_id, timeout=120)
-
-        # Download mind map as JSON to temp file
-        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
-            tmp_path = f.name
-
-        try:
-            await client.artifacts.download_mind_map(nb_id, tmp_path)
-            with open(tmp_path) as f:
-                mind_map = json.load(f)
-            logger.info(f"Mind map generated for notebook {nb_id}")
-            return mind_map
-        finally:
-            Path(tmp_path).unlink(missing_ok=True)
+        # generate_mind_map returns dict directly (no task_id, no wait needed)
+        mind_map = await client.artifacts.generate_mind_map(nb_id)
+        logger.info(f"Mind map generated for notebook {nb_id}")
+        return mind_map
 
     async def generate_data_table(self, notebook_id: str | None = None) -> str:
         """Generate data table CSV from signals. Returns CSV content."""
