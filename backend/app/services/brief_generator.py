@@ -123,7 +123,7 @@ class BriefGenerator:
             except (json.JSONDecodeError, TypeError):
                 pass
 
-        is_actionable = max_priority >= 60 and len(all_market_ids) > 0
+        is_actionable = max_priority >= 60
 
         return {
             "title": title,
