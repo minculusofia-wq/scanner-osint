@@ -116,7 +116,7 @@ class MarketMatcher:
                         event_title = event.get("title", "")
                         for market in event.get("markets", []):
                             question = market.get("question", "")
-                            condition_id = market.get("condition_id", "")
+                            condition_id = market.get("conditionId") or market.get("condition_id", "")
                             if not condition_id:
                                 continue
 
