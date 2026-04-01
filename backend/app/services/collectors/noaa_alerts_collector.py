@@ -133,7 +133,7 @@ class NOAACollector(BaseCollector):
                         title=title,
                         summary=summary,
                         url=f"https://alerts.weather.gov",
-                        category="geopolitical",
+                        category="weather",
                         region=region,
                         tags=tags,
                         raw_relevance=relevance,

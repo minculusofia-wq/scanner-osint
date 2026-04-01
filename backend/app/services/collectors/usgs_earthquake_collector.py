@@ -164,7 +164,7 @@ class USGSEarthquakeCollector(BaseCollector):
                     title=title,
                     summary=summary,
                     url=url,
-                    category="geopolitical",
+                    category="natural_disaster",
                     region=region,
                     tags=tags,
                     raw_relevance=relevance,
