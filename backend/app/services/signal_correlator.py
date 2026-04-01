@@ -227,6 +227,7 @@ class SignalCorrelator:
                 dominant_category=dominant_category,
                 countries=countries[:10],
                 keywords=keywords[:15],
+                graph_data=graph_data,
             ))
 
         # Sort by score descending
@@ -346,14 +347,54 @@ class SignalCorrelator:
                 G.add_edge(item_id, ent_id, type="mentions")
         return G
 
-    def _graph_to_dict(self, G: nx.Graph) -> dict:
-        """Convert nx.Graph to D3-like JSON format for React Flow / Xyflow."""
+    def _graph_to_dict(self, G: nx.Graph, max_entities: int = 40) -> dict:
+        """Convert nx.Graph to flat JSON for KnowledgeGraph.tsx.
+
+        Creates an entity co-occurrence graph: two entities are linked
+        if they appear in the same source item. Limited to top N entities.
+        """
+        if G.number_of_nodes() == 0:
+            return {"nodes": [], "edges": []}
+
+        # Select top entities by degree (most mentioned)
+        entity_nodes = [(n, G.degree(n)) for n in G.nodes if n.startswith("ent_")]
+        entity_nodes.sort(key=lambda x: x[1], reverse=True)
+        top_entities = set(n for n, _ in entity_nodes[:max_entities])
+
+        if not top_entities:
+            return {"nodes": [], "edges": []}
+
+        # Build co-occurrence edges: entities linked through shared items
+        entity_items: dict[str, set[str]] = {}
+        for ent_id in top_entities:
+            entity_items[ent_id] = set(G.neighbors(ent_id))
+
         nodes = []
-        for node_id, data in G.nodes(data=True):
-            nodes.append({"id": node_id, "data": data})
+        for ent_id in top_entities:
+            data = G.nodes[ent_id]
+            nodes.append({
+                "id": ent_id,
+                "label": data.get("label", ent_id.replace("ent_", "")),
+                "type": data.get("type", "event"),
+            })
+
         edges = []
-        for u, v, data in G.edges(data=True):
-            edges.append({"id": f"{u}-{v}", "source": u, "target": v, "label": data.get("type", "")})
+        seen = set()
+        ent_list = list(top_entities)
+        for i, a in enumerate(ent_list):
+            for b in ent_list[i + 1:]:
+                shared = entity_items[a] & entity_items[b]
+                if shared:
+                    edge_key = tuple(sorted([a, b]))
+                    if edge_key not in seen:
+                        seen.add(edge_key)
+                        edges.append({
+                            "id": f"{a}-{b}",
+                            "source": a,
+                            "target": b,
+                            "type": f"{len(shared)} sources",
+                        })
+
         return {"nodes": nodes, "edges": edges}
 
     def _extract_keywords(self, items: list[dict], top_n: int = 15) -> list[str]:
