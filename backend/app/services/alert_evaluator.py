@@ -236,23 +236,23 @@ class AlertEvaluator:
         title = f"{level_upper}: {event.tracker_name}"
 
         parts = [
-            f"**{region_label}** — Niveau d'escalade passe de "
-            f"`{event.old_level}` a `{event.new_level}` "
-            f"(score: {event.escalation_score:.0f}/100).",
+            f"**{region_label}** — Niveau d'escalade passé de "
+            f"`{event.old_level}` à `{event.new_level}` "
+            f"(score : {event.escalation_score:.0f}/100).",
         ]
 
         if event.signal_count_1h > 0:
             parts.append(
-                f"{event.signal_count_1h} signaux dans la derniere heure, "
-                f"{event.unique_sources_1h} sources independantes."
+                f"{event.signal_count_1h} signaux dans la dernière heure, "
+                f"{event.unique_sources_1h} sources indépendantes."
             )
 
         if event.matched_patterns:
             patterns_str = ", ".join(event.matched_patterns[:3])
-            parts.append(f"Patterns precurseurs detectes: {patterns_str}")
+            parts.append(f"Patterns précurseurs détectés : {patterns_str}")
 
         if event.countries:
-            parts.append(f"Pays concernes: {', '.join(event.countries[:5])}")
+            parts.append(f"Pays concernés : {', '.join(event.countries[:5])}")
 
         message = "\n\n".join(parts)
         return title, message

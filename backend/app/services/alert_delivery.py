@@ -65,14 +65,14 @@ class AlertDelivery:
             "inline": True,
         })
         fields.append({
-            "name": "Region",
+            "name": "Région",
             "value": event.region.replace("_", " ").title(),
             "inline": True,
         })
 
         if event.signal_count_1h > 0 or event.signal_count_6h > 0:
             fields.append({
-                "name": "Signals",
+                "name": "Signaux",
                 "value": (
                     f"1h: **{event.signal_count_1h}** | "
                     f"6h: **{event.signal_count_6h}** | "
@@ -104,7 +104,7 @@ class AlertDelivery:
                 f"• `{p}`" for p in event.matched_patterns[:5]
             )
             fields.append({
-                "name": "Patterns precurseurs",
+                "name": "Patterns précurseurs",
                 "value": patterns_str,
                 "inline": False,
             })
@@ -119,7 +119,7 @@ class AlertDelivery:
         if event.keywords:
             kw_str = ", ".join(event.keywords[:10])
             fields.append({
-                "name": "Mots-cles",
+                "name": "Mots-clés",
                 "value": kw_str,
                 "inline": False,
             })
@@ -129,7 +129,7 @@ class AlertDelivery:
                 f"• {q}" for q in event.linked_market_questions[:5]
             )
             fields.append({
-                "name": "Marches Polymarket lies",
+                "name": "Marchés Polymarket liés",
                 "value": markets_str,
                 "inline": False,
             })
@@ -139,7 +139,7 @@ class AlertDelivery:
             "description": message,
             "color": color,
             "fields": fields,
-            "footer": {"text": "Scanner OSINT — Early Warning System"},
+            "footer": {"text": "Scanner OSINT — Système d'Alerte Précoce"},
             "timestamp": datetime.utcnow().isoformat(),
         }
 
@@ -248,7 +248,7 @@ class AlertDelivery:
             results["discord"] = await self.send_discord(
                 config.discord_webhook_url,
                 test_event,
-                "TEST — Early Warning System",
+                "TEST — Système d'Alerte Précoce",
                 "Ceci est une alerte de test. Si vous recevez ce message, "
                 "la connexion Discord est fonctionnelle.",
             )
@@ -258,8 +258,8 @@ class AlertDelivery:
                 config.webhook_url,
                 config.webhook_secret,
                 test_event,
-                "TEST — Early Warning System",
-                "Test alert — webhook connection verified.",
+                "TEST — Système d'Alerte Précoce",
+                "Alerte de test — connexion webhook vérifiée.",
             )
 
         return results

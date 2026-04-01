@@ -153,21 +153,21 @@ class BriefGenerator:
         bearish_count = sum(1 for kw in self.BEARISH_KEYWORDS if kw in text)
 
         if avg_sentiment > 0.3 or bullish_count > bearish_count:
-            direction = "positive"
-            action = "Consider YES positions on related markets"
+            direction = "positif"
+            action = "Envisager des positions YES sur les marchés liés"
         elif avg_sentiment < -0.3 or bearish_count > bullish_count:
-            direction = "negative"
-            action = "Consider NO positions or avoid YES on related markets"
+            direction = "négatif"
+            action = "Envisager des positions NO ou éviter YES sur les marchés liés"
         else:
-            direction = "mixed"
-            action = "Monitor closely — sentiment is mixed"
+            direction = "mixte"
+            action = "Surveiller de près — sentiment mixte"
 
         source_count = len(items)
         if source_count >= 5:
-            confidence_note = f"Signal confirmed by {source_count} sources."
+            confidence_note = f"Signal confirmé par {source_count} sources."
         elif source_count >= 3:
-            confidence_note = f"Moderate signal ({source_count} sources)."
+            confidence_note = f"Signal modéré ({source_count} sources)."
         else:
-            confidence_note = f"Early signal ({source_count} sources), verify before acting."
+            confidence_note = f"Signal précoce ({source_count} sources), vérifier avant d'agir."
 
-        return f"{action}. {confidence_note} Overall sentiment: {direction} ({avg_sentiment:+.2f})."
+        return f"{action}. {confidence_note} Sentiment global : {direction} ({avg_sentiment:+.2f})."

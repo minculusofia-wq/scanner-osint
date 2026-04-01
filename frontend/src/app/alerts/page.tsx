@@ -16,8 +16,8 @@ export default function AlertsPage() {
   return (
     <div className="space-y-6">
       <Header
-        title="Systeme d'alerte"
-        subtitle="Early Warning — Detection predictive multi-sources"
+        title="Système d'alerte"
+        subtitle="Détection prédictive multi-sources"
         action={
           <div className="flex gap-2">
             <Link
@@ -77,7 +77,7 @@ export default function AlertsPage() {
           {escalations.length > activeEscalations.length && (
             <section>
               <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                Trackers stables ({escalations.length - activeEscalations.length})
+                Suivis stables ({escalations.length - activeEscalations.length})
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                 {escalations
@@ -96,7 +96,7 @@ export default function AlertsPage() {
             </h3>
             {history.length === 0 ? (
               <div className="rounded-xl border border-gray-800 bg-gray-900/40 p-6 text-center text-gray-500 text-sm">
-                Aucune alerte envoyee pour le moment
+                Aucune alerte envoyée pour le moment
               </div>
             ) : (
               <div className="rounded-xl border border-gray-800 bg-gray-900/60 divide-y divide-gray-800/50 px-4">

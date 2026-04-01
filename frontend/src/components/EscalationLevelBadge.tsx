@@ -37,7 +37,7 @@ const LEVEL_STYLES: Record<
 const LEVEL_LABELS: Record<EscalationLevel, string> = {
   stable: "Stable",
   concerning: "Surveiller",
-  elevated: "Eleve",
+  elevated: "Élevé",
   critical: "Critique",
   crisis: "Crise",
 };

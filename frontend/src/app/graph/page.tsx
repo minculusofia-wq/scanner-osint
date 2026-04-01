@@ -22,8 +22,8 @@ export default function GraphPage() {
   return (
     <div className="space-y-6 h-full flex flex-col">
       <Header
-        title="Analyse de Confluence (Link Analysis)"
-        subtitle="Visualisation du Knowledge Graph Palantir"
+        title="Analyse de Confluence"
+        subtitle="Visualisation du graphe de connaissances"
         action={
           <button
             onClick={refresh}
@@ -76,14 +76,14 @@ export default function GraphPage() {
           ) : selectedBrief && selectedBrief.graph_data && JSON.parse(selectedBrief.graph_data).nodes?.length > 0 ? (
             <KnowledgeGraph 
               data={JSON.parse(selectedBrief.graph_data)} 
-              title={`Graphique pour: ${selectedBrief.ai_title || selectedBrief.title}`}
+              title={`Graphe : ${selectedBrief.ai_title || selectedBrief.title}`}
             />
           ) : (
             <div className="w-full h-[600px] flex flex-col items-center justify-center bg-slate-950 rounded-xl border border-slate-800 text-center p-8">
               <div className="text-4xl mb-4">🕸️</div>
               <h3 className="text-slate-300 font-medium mb-2">Pas encore de données de graphe</h3>
               <p className="text-slate-500 text-sm max-w-md">
-                Lancez une nouvelle collecte pour générer les connexions d'entités Palantir pour ce cluster d'intelligence.
+                Lancez une nouvelle collecte pour générer les connexions d'entités pour ce cluster d'intelligence.
               </p>
             </div>
           )}
@@ -92,14 +92,14 @@ export default function GraphPage() {
           {selectedBrief && (
             <div className="p-4 bg-slate-900/50 border border-slate-800 rounded-xl">
               <h3 className="text-sm font-semibold text-slate-200 mb-2 flex items-center gap-2">
-                <span className="text-indigo-400">✨</span> Analyse de Signal
+                <span className="text-indigo-400">✨</span> Analyse du signal
               </h3>
               <p className="text-sm text-slate-400 leading-relaxed italic">
                 {selectedBrief.ai_situation || selectedBrief.ai_analysis || selectedBrief.summary}
               </p>
               {selectedBrief.ai_trading_signal && (
                 <div className="mt-3 p-2 bg-indigo-500/10 border border-indigo-500/20 rounded text-xs text-indigo-300">
-                  <span className="font-bold">SIGNAL TRADING:</span> {selectedBrief.ai_trading_signal}
+                  <span className="font-bold">SIGNAL :</span> {selectedBrief.ai_trading_signal}
                 </div>
               )}
             </div>
