@@ -5,11 +5,29 @@ import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { chatWithAI, ChatMessage } from "@/lib/api";
 
+const STORAGE_KEY = "osint_chat_history";
+
+function loadMessages(): ChatMessage[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveMessages(msgs: ChatMessage[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(msgs.slice(-50)));
+  } catch {}
+}
+
 function ChatContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q");
 
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>(loadMessages);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -18,6 +36,11 @@ function ChatContent() {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  // Persist messages to localStorage
+  useEffect(() => {
+    saveMessages(messages);
+  }, [messages]);
 
   useEffect(() => {
     scrollToBottom();
@@ -30,6 +53,11 @@ function ChatContent() {
       handleSend(initialQuery);
     }
   }, [initialQuery]);
+
+  const clearChat = () => {
+    setMessages([]);
+    localStorage.removeItem(STORAGE_KEY);
+  };
 
   const handleSend = async (overrideInput?: string) => {
     const userMsg = (overrideInput || input).trim();
@@ -78,6 +106,16 @@ function ChatContent() {
       <Header
         title="Assistant IA (Alpha Terminal)"
         subtitle="Posez vos questions sur les derniers signaux OSINT"
+        action={
+          messages.length > 0 ? (
+            <button
+              onClick={clearChat}
+              className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm font-medium transition-colors"
+            >
+              Nouvelle conversation
+            </button>
+          ) : undefined
+        }
       />
 
       <div className="flex-1 bg-slate-900/50 border border-slate-700/50 rounded-lg mt-4 overflow-hidden flex flex-col relative">
