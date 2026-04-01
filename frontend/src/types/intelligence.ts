@@ -47,6 +47,7 @@ export interface IntelligenceBrief {
 export interface LinkedMarket {
   condition_id: string;
   question: string;
+  slug?: string;
 }
 
 export interface OSINTConfig {

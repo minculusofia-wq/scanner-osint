@@ -200,6 +200,7 @@ class OSINTService:
             markets = await self.matcher.find_matching_markets(item)
             item["linked_market_ids"] = json.dumps([m["condition_id"] for m in markets])
             item["linked_market_questions"] = json.dumps([m["question"] for m in markets])
+            item["linked_market_slugs"] = json.dumps([m.get("slug", "") for m in markets])
 
             scoring = self.scorer.score_item(item, has_market_match=len(markets) > 0)
             item.update(scoring)
@@ -233,6 +234,7 @@ class OSINTService:
                 market_impact=item.get("market_impact", "neutral"),
                 linked_market_ids=item.get("linked_market_ids", "[]"),
                 linked_market_questions=item.get("linked_market_questions", "[]"),
+                linked_market_slugs=item.get("linked_market_slugs", "[]"),
                 published_at=item.get("published_at"),
                 collected_at=datetime.utcnow(),
                 created_at=datetime.utcnow(),
@@ -265,6 +267,7 @@ class OSINTService:
                 "sentiment_score": ri.sentiment_score,
                 "linked_market_ids": ri.linked_market_ids,
                 "linked_market_questions": ri.linked_market_questions,
+                "linked_market_slugs": ri.linked_market_slugs if hasattr(ri, 'linked_market_slugs') else "[]",
                 "source": ri.source,
             })
 
@@ -306,6 +309,7 @@ class OSINTService:
                 source_count=brief_data.get("source_count", 0),
                 linked_market_ids=brief_data.get("linked_market_ids", "[]"),
                 linked_market_questions=brief_data.get("linked_market_questions", "[]"),
+                linked_market_slugs=brief_data.get("linked_market_slugs", "[]"),
                 category=brief_data.get("category", "general"),
                 region=brief_data.get("region", ""),
                 is_actionable=brief_data.get("is_actionable", False),
@@ -523,13 +527,15 @@ class OSINTService:
         try:
             market_ids = json.loads(item.linked_market_ids) if item.linked_market_ids else []
             market_qs = json.loads(item.linked_market_questions) if item.linked_market_questions else []
+            market_slugs = json.loads(item.linked_market_slugs) if getattr(item, 'linked_market_slugs', None) else []
         except json.JSONDecodeError:
             market_ids = []
             market_qs = []
+            market_slugs = []
 
         linked_markets = [
-            {"condition_id": mid, "question": mq}
-            for mid, mq in zip(market_ids, market_qs)
+            {"condition_id": mid, "question": mq, "slug": market_slugs[i] if i < len(market_slugs) else ""}
+            for i, (mid, mq) in enumerate(zip(market_ids, market_qs))
         ]
 
         return {
@@ -557,13 +563,15 @@ class OSINTService:
         try:
             market_ids = json.loads(brief.linked_market_ids) if brief.linked_market_ids else []
             market_qs = json.loads(brief.linked_market_questions) if brief.linked_market_questions else []
+            market_slugs = json.loads(brief.linked_market_slugs) if getattr(brief, 'linked_market_slugs', None) else []
         except json.JSONDecodeError:
             market_ids = []
             market_qs = []
+            market_slugs = []
 
         linked_markets = [
-            {"condition_id": mid, "question": mq}
-            for mid, mq in zip(market_ids, market_qs)
+            {"condition_id": mid, "question": mq, "slug": market_slugs[i] if i < len(market_slugs) else ""}
+            for i, (mid, mq) in enumerate(zip(market_ids, market_qs))
         ]
 
         return {

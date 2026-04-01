@@ -112,14 +112,17 @@ class BriefGenerator:
         # Collect all linked markets
         all_market_ids = []
         all_market_questions = []
+        all_market_slugs = []
         for item in items:
             try:
                 ids = json.loads(item.get("linked_market_ids", "[]"))
                 questions = json.loads(item.get("linked_market_questions", "[]"))
-                for mid, mq in zip(ids, questions):
+                slugs = json.loads(item.get("linked_market_slugs", "[]"))
+                for i_idx, (mid, mq) in enumerate(zip(ids, questions)):
                     if mid not in all_market_ids:
                         all_market_ids.append(mid)
                         all_market_questions.append(mq)
+                        all_market_slugs.append(slugs[i_idx] if i_idx < len(slugs) else "")
             except (json.JSONDecodeError, TypeError):
                 pass
 
@@ -136,6 +139,7 @@ class BriefGenerator:
             "source_count": len(items),
             "linked_market_ids": json.dumps(all_market_ids[:5]),
             "linked_market_questions": json.dumps(all_market_questions[:5]),
+            "linked_market_slugs": json.dumps(all_market_slugs[:5]),
             "category": category,
             "region": region,
             "is_actionable": is_actionable,

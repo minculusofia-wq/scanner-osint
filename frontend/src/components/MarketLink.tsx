@@ -3,7 +3,7 @@ import type { LinkedMarket } from "@/types/intelligence";
 export function MarketLink({ market }: { market: LinkedMarket }) {
   return (
     <a
-      href={`https://polymarket.com/event/${market.condition_id}`}
+      href={market.slug ? `https://polymarket.com/event/${market.slug}` : `https://polymarket.com/markets?_q=${encodeURIComponent(market.question)}`}
       target="_blank"
       rel="noopener noreferrer"
       className="inline-flex items-center gap-1 px-2 py-1 rounded bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs hover:bg-indigo-500/20 transition-colors"

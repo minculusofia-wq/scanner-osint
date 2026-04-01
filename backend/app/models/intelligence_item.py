@@ -48,6 +48,7 @@ class IntelligenceItem(Base):
     # Market linking
     linked_market_ids: Mapped[str] = mapped_column(Text, default="[]")
     linked_market_questions: Mapped[str] = mapped_column(Text, default="[]")
+    linked_market_slugs: Mapped[str] = mapped_column(Text, default="[]")
 
     # Metadata
     published_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

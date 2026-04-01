@@ -28,6 +28,7 @@ class IntelligenceBrief(Base):
     # Market mapping
     linked_market_ids: Mapped[str] = mapped_column(Text, default="[]")
     linked_market_questions: Mapped[str] = mapped_column(Text, default="[]")
+    linked_market_slugs: Mapped[str] = mapped_column(Text, default="[]")
     category: Mapped[str] = mapped_column(String(50), default="general")
     region: Mapped[str] = mapped_column(String(100), default="")
 

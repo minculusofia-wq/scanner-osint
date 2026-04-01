@@ -9,6 +9,7 @@ import { SentimentIndicator } from "@/components/SentimentIndicator";
 interface MarketGroup {
   condition_id: string;
   question: string;
+  slug: string;
   items: {
     id: number;
     title: string;
@@ -34,6 +35,7 @@ export default function MarketsPage() {
           groups[key] = {
             condition_id: market.condition_id,
             question: market.question,
+            slug: market.slug || "",
             items: [],
             avg_sentiment: 0,
             max_priority: 0,
@@ -90,7 +92,7 @@ export default function MarketsPage() {
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div>
                   <a
-                    href={`https://polymarket.com/event/${group.condition_id}`}
+                    href={group.slug ? `https://polymarket.com/event/${group.slug}` : `https://polymarket.com/markets?_q=${encodeURIComponent(group.question)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm font-semibold text-white hover:text-indigo-400 transition-colors"

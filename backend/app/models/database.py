@@ -58,6 +58,15 @@ async def init_db():
         except Exception as e:
             logger.debug("Migration graph_data: %s", e)
 
+        # Migrate: add linked_market_slugs
+        for table in ["intelligence_items", "intelligence_briefs"]:
+            try:
+                await conn.execute(
+                    text(f"ALTER TABLE {table} ADD COLUMN linked_market_slugs TEXT DEFAULT '[]'")
+                )
+            except Exception as e:
+                logger.debug("Migration linked_market_slugs on %s: %s", table, e)
+
 
 async def get_db():
     async with async_session() as session:

@@ -79,6 +79,7 @@ class MarketMatcher:
                 "question": market.get("question", ""),
                 "token_id": market.get("token_id_yes", ""),
                 "price_yes": market.get("price_yes", 0),
+                "slug": market.get("slug", ""),
             })
 
         return results
@@ -150,12 +151,14 @@ class MarketMatcher:
                             price_yes = float(prices[0]) if prices else 0
                             token_id_yes = token_ids[0] if token_ids else ""
 
+                            slug = market.get("slug", "")
                             markets.append({
                                 "condition_id": condition_id,
                                 "question": question,
                                 "group_title": event_title,
                                 "token_id_yes": token_id_yes,
                                 "price_yes": price_yes,
+                                "slug": slug,
                             })
 
                     offset += 100
