@@ -1,7 +1,7 @@
 # Project Documentation (Auto-generated)
 
 > This file is automatically updated by Claude Code hooks.
-> Last updated: 2026-03-24 11:26:18
+> Last updated: 2026-04-01 12:07:30
 
 ## Project Structure
 
@@ -9,6 +9,7 @@
 /Users/anthony/Desktop/scanner osint
 /Users/anthony/Desktop/scanner osint/.DS_Store
 /Users/anthony/Desktop/scanner osint/frontend
+/Users/anthony/Desktop/scanner osint/frontend/.DS_Store
 /Users/anthony/Desktop/scanner osint/frontend/node_modules
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/.bin
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/@alloc
@@ -27,7 +28,6 @@
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/has-property-descriptors
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/has-proto
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/has-tostringtag
-/Users/anthony/Desktop/scanner osint/frontend/node_modules/imurmurhash
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/is-array-buffer
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/is-bigint
 /Users/anthony/Desktop/scanner osint/frontend/node_modules/is-typed-array
@@ -76,14 +76,14 @@
 @router.get("/patterns")
 @router.get("/status")
 @router.post("/generate-deep-dive")
+@router.post("/generate-mind-map")
+@router.post("/generate-data-table")
 @router.get("/items/")
 @router.get("/briefs/")
 @router.get("/predictions/")
 @router.post("/chat", response_model=ChatResponse)
 @router.post("/briefs/{brief_id}/dismiss")
 @router.post("/collect")
-@router.get("/stats")
-@router.get("/config")
 ```
 
 ## Database
@@ -124,28 +124,28 @@ This appears to be a trading bot project. Key patterns detected:
 ## Recent Session Activity
 
 ### Session Summary: scanner osint
-*2026-03-04*
+*2026-03-24*
 Recent Commits:
-- 91a931e fix: switch to gemini-2.5-flash (2.0-flash quota blocked)
-- 57fdd44 fix: syntax error in ai_analyzer f-string with escaped quotes
-- a65a49a fix: handle Gemini 429 rate limit gracefully in AI analyzer
-- 8f947c9 refactor: switch AI analysis from Claude Sonnet to Gemini Flash...
+- ae9a493 fix: Polymarket matching broken — conditionId (camelCase) not condition_id
+- a5faa5b fix: don't wait for podcast completion (takes 5-10min), return URL immediately
+- 09fe494 fix: generate_mind_map takes no custom_prompt/language args — returns dict directly
+- 6a70a63 fix:...
 
 ### Session Summary: scanner osint
-*2026-03-04*
+*2026-03-24*
 Recent Commits:
-- 57fdd44 fix: syntax error in ai_analyzer f-string with escaped quotes
-- a65a49a fix: handle Gemini 429 rate limit gracefully in AI analyzer
-- 8f947c9 refactor: switch AI analysis from Claude Sonnet to Gemini Flash (free)
-- 8a03191 feat: integrate Claude Sonnet AI for actionable...
+- ae9a493 fix: Polymarket matching broken — conditionId (camelCase) not condition_id
+- a5faa5b fix: don't wait for podcast completion (takes 5-10min), return URL immediately
+- 09fe494 fix: generate_mind_map takes no custom_prompt/language args — returns dict directly
+- 6a70a63 fix:...
 
 ### Session Summary: scanner osint
-*2026-03-04*
+*2026-03-24*
 Recent Commits:
-- 57fdd44 fix: syntax error in ai_analyzer f-string with escaped quotes
-- a65a49a fix: handle Gemini 429 rate limit gracefully in AI analyzer
-- 8f947c9 refactor: switch AI analysis from Claude Sonnet to Gemini Flash (free)
-- 8a03191 feat: integrate Claude Sonnet AI for actionable...
+- a5faa5b fix: don't wait for podcast completion (takes 5-10min), return URL immediately
+- 09fe494 fix: generate_mind_map takes no custom_prompt/language args — returns dict directly
+- 6a70a63 fix: NotebookLM client requires async context manager initialization
+- bf2f81e fix: briefs...
 
 ## Instructions for Claude
 
