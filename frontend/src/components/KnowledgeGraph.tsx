@@ -33,7 +33,7 @@ const nodeColors: Record<string, string> = {
 
 export default function KnowledgeGraph({ data, title }: KnowledgeGraphProps) {
   const initialNodes: Node[] = useMemo(() => {
-    return data.nodes.map((n, i) => ({
+    return (data.nodes ?? []).map((n, i) => ({
       id: n.id,
       data: { label: n.label || n.id },
       position: { x: Math.random() * 400, y: Math.random() * 400 },
@@ -54,7 +54,7 @@ export default function KnowledgeGraph({ data, title }: KnowledgeGraphProps) {
   }, [data.nodes]);
 
   const initialEdges: Edge[] = useMemo(() => {
-    return data.edges.map((e, i) => ({
+    return (data.edges ?? []).map((e, i) => ({
       id: `e-${i}`,
       source: e.source,
       target: e.target,

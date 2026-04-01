@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Header } from '@/components/layout/Header';
 import KnowledgeGraph from '@/components/KnowledgeGraph';
 import { useIntelligence } from '@/hooks/useIntelligence';
@@ -12,6 +12,18 @@ export default function GraphPage() {
   const [selectedBriefId, setSelectedBriefId] = useState<number | null>(null);
 
   const selectedBrief = briefs.find(b => b.id === selectedBriefId) || briefs[0];
+
+  const parsedGraphData = useMemo(() => {
+    if (!selectedBrief?.graph_data) return null;
+    try {
+      const parsed = typeof selectedBrief.graph_data === 'string'
+        ? JSON.parse(selectedBrief.graph_data)
+        : selectedBrief.graph_data;
+      return parsed?.nodes?.length > 0 ? parsed : null;
+    } catch {
+      return null;
+    }
+  }, [selectedBrief]);
 
   useEffect(() => {
     if (!selectedBriefId && briefs.length > 0) {
@@ -73,10 +85,10 @@ export default function GraphPage() {
             <div className="w-full h-[600px] flex items-center justify-center bg-slate-950 rounded-xl border border-slate-800">
               <div className="text-slate-500 animate-pulse">Génération du graphe...</div>
             </div>
-          ) : selectedBrief && selectedBrief.graph_data && JSON.parse(selectedBrief.graph_data).nodes?.length > 0 ? (
-            <KnowledgeGraph 
-              data={JSON.parse(selectedBrief.graph_data)} 
-              title={`Graphe : ${selectedBrief.ai_title || selectedBrief.title}`}
+          ) : parsedGraphData ? (
+            <KnowledgeGraph
+              data={parsedGraphData}
+              title={`Graphe : ${selectedBrief?.ai_title || selectedBrief?.title || ''}`}
             />
           ) : (
             <div className="w-full h-[600px] flex flex-col items-center justify-center bg-slate-950 rounded-xl border border-slate-800 text-center p-8">

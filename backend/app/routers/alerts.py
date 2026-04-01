@@ -203,12 +203,12 @@ async def list_patterns():
         {
             "id": p.name,
             "name": p.name,
-            "category": p.category,
+            "category": p.severity,
             "severity": p.severity,
             "description": p.description,
             "required_sources": p.required_sources,
             "min_source_match": p.min_source_match,
-            "keywords": p.keywords[:20],
+            "keywords": p.required_keywords[:20],
             "min_keyword_match": p.min_keyword_match,
         }
         for p in ALL_PATTERNS

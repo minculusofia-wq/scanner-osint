@@ -65,12 +65,12 @@ export function EscalationCard({
             {tracker.unique_sources_1h}
           </span>{" "}
           sources (1h) &middot;{" "}
-          {tracker.contributing_source_types.slice(0, 5).join(", ")}
+          {(tracker.contributing_source_types ?? []).slice(0, 5).join(", ")}
         </div>
       )}
 
       {/* Patterns */}
-      {tracker.matched_patterns.length > 0 && (
+      {(tracker.matched_patterns ?? []).length > 0 && (
         <div className="flex flex-wrap gap-1">
           {tracker.matched_patterns.slice(0, 3).map((p) => (
             <span

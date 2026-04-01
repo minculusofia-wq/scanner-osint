@@ -29,7 +29,7 @@ export default function MarketsPage() {
     const groups: Record<string, MarketGroup> = {};
 
     for (const item of items) {
-      for (const market of item.linked_markets) {
+      for (const market of item.linked_markets ?? []) {
         const key = market.condition_id;
         if (!groups[key]) {
           groups[key] = {

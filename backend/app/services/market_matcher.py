@@ -1,3 +1,4 @@
+import json
 import logging
 import re
 import time
@@ -125,7 +126,6 @@ class MarketMatcher:
                             token_ids = []
                             if isinstance(tokens, str) and tokens.startswith("["):
                                 try:
-                                    import json
                                     token_ids = json.loads(tokens)
                                 except Exception:
                                     pass
@@ -135,7 +135,6 @@ class MarketMatcher:
                             outcomes = market.get("outcomes", "")
                             if isinstance(outcomes, str):
                                 try:
-                                    import json
                                     outcomes = json.loads(outcomes)
                                 except Exception:
                                     outcomes = []
@@ -143,7 +142,6 @@ class MarketMatcher:
                             prices = market.get("outcomePrices", "")
                             if isinstance(prices, str):
                                 try:
-                                    import json
                                     prices = json.loads(prices)
                                 except Exception:
                                     prices = []

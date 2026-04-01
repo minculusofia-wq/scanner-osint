@@ -61,7 +61,7 @@ export default function AlertsPage() {
                 </p>
                 <p className="text-xs text-gray-600 mt-1">
                   Les escalades apparaissent quand plusieurs sources convergent
-                  sur la meme region
+                  sur la même région
                 </p>
               </div>
             ) : (

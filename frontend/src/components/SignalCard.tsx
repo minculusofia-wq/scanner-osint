@@ -26,7 +26,7 @@ export function SignalCard({ brief }: { brief: IntelligenceBrief }) {
 
       {topMarket && (
         <a
-          href={`https://polymarket.com/event/${topMarket.condition_id}`}
+          href={topMarket.slug ? `https://polymarket.com/event/${topMarket.slug}` : `https://polymarket.com/markets?_q=${encodeURIComponent(topMarket.question)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="block text-xs text-indigo-400 hover:text-indigo-300 truncate"
