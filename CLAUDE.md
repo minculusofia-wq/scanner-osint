@@ -1,7 +1,7 @@
 # Project Documentation (Auto-generated)
 
 > This file is automatically updated by Claude Code hooks.
-> Last updated: 2026-04-01 12:07:30
+> Last updated: 2026-04-11 16:05:33
 
 ## Project Structure
 
@@ -124,28 +124,28 @@ This appears to be a trading bot project. Key patterns detected:
 ## Recent Session Activity
 
 ### Session Summary: scanner osint
-*2026-03-24*
+*2026-04-01*
 Recent Commits:
-- ae9a493 fix: Polymarket matching broken — conditionId (camelCase) not condition_id
-- a5faa5b fix: don't wait for podcast completion (takes 5-10min), return URL immediately
-- 09fe494 fix: generate_mind_map takes no custom_prompt/language args — returns dict directly
-- 6a70a63 fix:...
+- dad1d66 fix: debug complet backend+frontend — 12 bugs corrigés
+- c6794d4 fix: météo classée weather (pas geopolitical) + labels français enrichis
+- 37faeeb chore: update CLAUDE.md + cleanup stray file
+- 2fb3e40 feat: liens directs Polymarket avec slug
 
 ### Session Summary: scanner osint
-*2026-03-24*
+*2026-04-01*
 Recent Commits:
-- ae9a493 fix: Polymarket matching broken — conditionId (camelCase) not condition_id
-- a5faa5b fix: don't wait for podcast completion (takes 5-10min), return URL immediately
-- 09fe494 fix: generate_mind_map takes no custom_prompt/language args — returns dict directly
-- 6a70a63 fix:...
+- c6794d4 fix: météo classée weather (pas geopolitical) + labels français enrichis
+- 37faeeb chore: update CLAUDE.md + cleanup stray file
+- 2fb3e40 feat: liens directs Polymarket avec slug
+- c2d0026 fix: graph_data manquant — 2 bugs corrigés
 
 ### Session Summary: scanner osint
-*2026-03-24*
+*2026-04-01*
 Recent Commits:
-- a5faa5b fix: don't wait for podcast completion (takes 5-10min), return URL immediately
-- 09fe494 fix: generate_mind_map takes no custom_prompt/language args — returns dict directly
-- 6a70a63 fix: NotebookLM client requires async context manager initialization
-- bf2f81e fix: briefs...
+- 37faeeb chore: update CLAUDE.md + cleanup stray file
+- 2fb3e40 feat: liens directs Polymarket avec slug
+- c2d0026 fix: graph_data manquant — 2 bugs corrigés
+- 69295d9 feat: chat persistant via localStorage + bouton nouvelle conversation
 
 ## Instructions for Claude
 
